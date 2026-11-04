@@ -1,0 +1,16 @@
+.venv/
+.runtime/
+venv/
+build/
+dist/
+__pycache__/
+**/__pycache__/
+*.pyc
+ThermoRawFileParser/
+*.mzML
+*.mzXML
+*.raw
+*.spec
+*.bat
+*.ps1
+*.sh

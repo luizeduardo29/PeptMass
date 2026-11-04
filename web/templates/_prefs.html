@@ -1,0 +1,29 @@
+{# Preferencias do topo, no formato da Hub: globo + sigla + seta; dentro,
+   IDIOMA (nome e sigla) e MODO DE COR (claro, escuro).
+
+   E um <details>: abre e troca sem JavaScript. Cada opcao e a PROPRIA pagina
+   com ?lang= / ?tema= (o servidor grava num cookie). Com JavaScript o modo de
+   cor troca na hora, sem recarregar (app.js). #}
+<details class="seletor-idioma">
+  <summary class="btn-icone" title="{{ _('prefs.menu') }}" aria-label="{{ _('prefs.menu') }}">
+    <svg class="icone" aria-hidden="true"><use href="#i-globo"/></svg><span>{{ lang.split('-')[0] | upper }}</span><svg class="icone seta" aria-hidden="true"><use href="#i-seta-baixo"/></svg>
+  </summary>
+  <div class="menu-idioma">
+    <p class="menu-titulo">{{ _('prefs.language') }}</p>
+    {% for item in langs %}
+    {% set query = request.args.to_dict() %}{% set _unused = query.update({'lang': item.code}) %}
+    <a class="opcao-idioma{{ ' ativa' if item.code == lang }}" href="{{ request.path }}?{{ query | urlencode }}" lang="{{ item.code }}"{% if item.code == lang %} aria-current="true"{% endif %}>
+      <span>{{ item.name }}</span><span class="sigla">{{ item.code.split('-')[0] | upper }}</span>
+    </a>
+    {% endfor %}
+    <p class="menu-titulo secao">{{ _('prefs.color_mode') }}</p>
+    <div class="modo-cor" role="group" aria-label="{{ _('prefs.color_mode') }}">
+      {% for nome in temas %}
+      {% set query = request.args.to_dict() %}{% set _unused = query.update({'tema': nome}) %}
+      <a class="opcao-modo{{ ' ativa' if nome == tema }}" href="{{ request.path }}?{{ query | urlencode }}" data-tema-opcao="{{ nome }}"{% if nome == tema %} aria-current="true"{% endif %}>
+        <svg class="icone" aria-hidden="true"><use href="#i-tema-{{ nome }}"/></svg><span>{{ _('prefs.theme.' ~ nome) }}</span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</details>

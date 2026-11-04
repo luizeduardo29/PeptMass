@@ -1,0 +1,74 @@
+<!doctype html>
+{# data-tema: o modo de cor ja sai do servidor (cookie), sem piscar o claro. #}
+<html lang="{{ lang }}" data-tema="{{ tema }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>{{ _('app.title') }}</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo-mini-64.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+{# Icones: a mesma familia de tracos da Hub, embutidos (roda sem internet). #}
+<svg class="sprite" aria-hidden="true" focusable="false">
+  <symbol id="i-inicio" viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-massa" viewBox="0 0 24 24"><path d="M12 3v18M7 21h10M5 7h14M5 7l-3 7a3.5 3.5 0 0 0 6 0zM19 7l-3 7a3.5 3.5 0 0 0 6 0z"/></symbol>
+  <symbol id="i-fragmentos" viewBox="0 0 24 24"><path d="M3 21h18M6 21v-6M10 21V5M14 21v-9M18 21v-4"/></symbol>
+  <symbol id="i-experimental" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></symbol>
+  <symbol id="i-biblioteca" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></symbol>
+  <symbol id="i-globo" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></symbol>
+  <symbol id="i-seta-baixo" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+  <symbol id="i-tema-claro" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></symbol>
+  <symbol id="i-tema-escuro" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></symbol>
+  <symbol id="i-alerta" viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01"/></symbol>
+  <symbol id="i-busca" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></symbol>
+  <symbol id="i-baixar" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol>
+  <symbol id="i-enviar" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></symbol>
+  <symbol id="i-copiar" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-mais" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-lixeira" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></symbol>
+  <symbol id="i-salvar" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></symbol>
+  <symbol id="i-abrir" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+</svg>
+
+<header class="topbar">
+  <a class="brand" href="{{ url_for('pages.home') }}">
+    {% include "_logo.html" %}
+    <span class="brand-textos">
+      <strong class="brand-nome">{% include "_brand.html" %}</strong>
+      <small class="brand-sub">{{ _('app.tagline') }}</small>
+    </span>
+  </a>
+  {% set nav_on = nav_active or 'home' %}
+  <nav class="nav">
+    <a href="{{ url_for('pages.home') }}" class="{{ 'on' if nav_on == 'home' }}" title="{{ _('nav.home') }}"><svg class="icone" aria-hidden="true"><use href="#i-inicio"/></svg><span>{{ _('nav.home') }}</span></a>
+    <a href="{{ url_for('pages.mass') }}" class="{{ 'on' if nav_on == 'mass' }}" title="{{ _('nav.mass') }}"><svg class="icone" aria-hidden="true"><use href="#i-massa"/></svg><span>{{ _('nav.mass') }}</span></a>
+    <a href="{{ url_for('pages.fragments') }}" class="{{ 'on' if nav_on == 'fragments' }}" title="{{ _('nav.fragments') }}"><svg class="icone" aria-hidden="true"><use href="#i-fragmentos"/></svg><span>{{ _('nav.fragments') }}</span></a>
+    <a href="{{ url_for('pages.experimental') }}" class="{{ 'on' if nav_on == 'experimental' }}" title="{{ _('nav.experimental') }}"><svg class="icone" aria-hidden="true"><use href="#i-experimental"/></svg><span>{{ _('nav.experimental') }}</span></a>
+    <a href="{{ url_for('pages.library') }}" class="{{ 'on' if nav_on == 'library' }}" title="{{ _('nav.library') }}"><svg class="icone" aria-hidden="true"><use href="#i-biblioteca"/></svg><span>{{ _('nav.library') }}</span></a>
+  </nav>
+  <div class="topo-controles">
+    {% include "_prefs.html" %}
+  </div>
+</header>
+
+<main class="page{% block page_class %}{% endblock %}">
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="foot">
+  <span>{{ _('app.footer', p=proton_mass) }}</span>
+  <span class="muted">v{{ app_version }}</span>
+</footer>
+
+{% block dialogs %}{% endblock %}
+<script id="i18n-catalog" type="application/json">{{ i18n_catalog | tojson }}</script>
+<script>window.PEPTMASS = {{ {'proton': proton_mass, 'lang': lang} | tojson }};</script>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

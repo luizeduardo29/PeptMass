@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block page_class %} page-larga{% endblock %}
+
+{# Biblioteca: o que no desktop estava espalhado na Aba 1 e na barra de
+   ferramentas - aminoacidos nao-naturais, modificacoes e a busca no PubChem. #}
+{% block content %}
+<div class="cabecalho-pagina">
+  <div>
+    <h1>{{ _('library.title') }}</h1>
+    <p class="lead">{{ _('library.lead') }}</p>
+  </div>
+  <div class="acoes-pagina">
+    <button type="button" class="ghost" id="btn-pubchem"><svg class="icone" aria-hidden="true"><use href="#i-busca"/></svg>{{ _('library.pubchem') }}</button>
+  </div>
+</div>
+<div class="notice ok" id="lib-aviso" hidden></div>
+
+<section class="card">
+  <h2>{{ _('library.residues.title') }}<span class="tag">{{ residues | length }}</span><span class="spacer"></span>
+    <button type="button" class="pequeno" id="btn-novo-residuo"><svg class="icone" aria-hidden="true"><use href="#i-mais"/></svg>{{ _('library.residues.new') }}</button>
+  </h2>
+  <p class="hint" style="margin:-6px 0 14px">{{ _('library.residues.help') }}</p>
+  <div class="toolbar"><input type="search" data-busca="tab-residuos" placeholder="{{ _('library.search') }}"></div>
+  <div class="table-wrap alta">
+    <table id="tab-residuos">
+      <thead>
+        <tr>
+          <th data-sort="text">{{ _('library.col.code') }}</th>
+          <th data-sort="text">{{ _('library.col.three') }}</th>
+          <th data-sort="text">{{ _('common.name') }}</th>
+          <th data-sort="text">{{ _('library.col.formula') }}</th>
+          <th class="num" data-sort="num">{{ _('library.col.mono') }}</th>
+          <th data-sort="text">{{ _('library.col.type') }}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in residues %}
+        <tr data-busca-nome="{{ r.code }} {{ r.three }} {{ r.name }}">
+          <td class="mono">{{ r.code if r.code | length == 1 else '[' ~ r.code ~ ']' }}</td>
+          <td>{{ r.three }}</td>
+          <td class="quebra">{{ r.name }}</td>
+          <td class="mono">{{ r.residue_formula }}</td>
+          <td class="num" data-v="{{ r.mono_mass }}">{{ '%.6f' | format(r.mono_mass) }}</td>
+          <td><span class="tag {{ 'na' if r.builtin else 'ok' }}">{{ _('library.builtin') if r.builtin else _('library.custom') }}</span></td>
+          <td class="acoes-linha">{% if not r.builtin %}<button type="button" class="danger pequeno" data-remover-residuo="{{ r.code }}" title="{{ _('common.remove') }}"><svg class="icone" aria-hidden="true"><use href="#i-lixeira"/></svg></button>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="card">
+  <h2>{{ _('library.mods.title') }}<span class="tag">{{ mods | length }}</span><span class="spacer"></span>
+    <button type="button" class="pequeno" id="btn-nova-mod"><svg class="icone" aria-hidden="true"><use href="#i-mais"/></svg>{{ _('library.mods.new') }}</button>
+  </h2>
+  <p class="hint" style="margin:-6px 0 14px">{{ _('library.mods.help') }}</p>
+  <div class="toolbar"><input type="search" data-busca="tab-mods" placeholder="{{ _('library.search') }}"></div>
+  <div class="table-wrap alta">
+    <table id="tab-mods">
+      <thead>
+        <tr>
+          <th data-sort="text">{{ _('common.name') }}</th>
+          <th data-sort="text">{{ _('dlg.mod.position') }}</th>
+          <th data-sort="text">{{ _('library.col.targets') }}</th>
+          <th data-sort="text">{{ _('library.col.delta_formula') }}</th>
+          <th class="num" data-sort="num">{{ _('library.col.delta') }}</th>
+          <th data-sort="text">{{ _('library.col.type') }}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in mods %}
+        {% set alvos = m.targets | reject('in', ['N-term', 'C-term', 'residue']) | sort | join('') %}
+        <tr data-busca-nome="{{ m.name }} {{ alvos }}" title="{{ m.description }}">
+          <td class="quebra"><strong>{{ m.name }}</strong></td>
+          <td>{{ _('position.' ~ m.position) }}</td>
+          <td class="mono">{{ alvos or '-' }}</td>
+          <td class="mono">{{ m.formula_str }}</td>
+          <td class="num" data-v="{{ m.mono_delta }}">{{ '%+.6f' | format(m.mono_delta) }}</td>
+          <td><span class="tag {{ 'ok' if m.name in custom_mods else 'na' }}">{{ _('library.custom') if m.name in custom_mods else _('library.default') }}</span></td>
+          <td class="acoes-linha">{% if m.name in custom_mods %}<button type="button" class="danger pequeno" data-remover-mod="{{ m.name }}" title="{{ _('common.remove') }}"><svg class="icone" aria-hidden="true"><use href="#i-lixeira"/></svg></button>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+
+{% block dialogs %}{% include "_dialogs.html" %}{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='peptmass.js') }}"></script>
+<script src="{{ url_for('static', filename='library.js') }}"></script>
+{% endblock %}

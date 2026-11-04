@@ -1,0 +1,19 @@
+# PeptMass web. Uma replica so': os arquivos de MS abertos ficam em memoria.
+services:
+  peptmass:
+    build: .
+    image: "peptmass:${TAG:-1.0}"
+    container_name: peptmass
+    restart: unless-stopped
+    mem_limit: "${MEM_LIMIT:-2g}"
+    ports:
+      - "${PORTA_HOST:-8010}:8010"
+    environment:
+      PEPTMASS_DATA_DIR: /data
+      PEPTMASS_MAX_UPLOAD_MB: "${PEPTMASS_MAX_UPLOAD_MB:-4096}"
+    volumes:
+      # Banco (peptideos salvos, residuos e modificacoes) e envios temporarios.
+      - peptmass_dados:/data
+
+volumes:
+  peptmass_dados:

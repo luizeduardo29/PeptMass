@@ -1,0 +1,7 @@
+{# Mascote do PeptMass. No topo vai a versao mini, com contorno branco no CSS
+   (.logo); a tela inicial usa a figura completa (logo_class='inicio-logo'). #}
+{% if logo_class == 'inicio-logo' %}
+<img class="inicio-logo" src="{{ url_for('static', filename='img/logo.png') }}" width="312" height="480" alt="">
+{% else %}
+<img class="logo" src="{{ url_for('static', filename='img/logo-mini-128.png') }}" width="128" height="128" alt="">
+{% endif %}

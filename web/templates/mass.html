@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block page_class %} page-larga{% endblock %}
+
+{# Aba 1 do desktop (MassTab): entrada a esquerda, resultados a direita. O
+   peptideo em edicao fica no navegador (localStorage) e as telas de
+   Fragmentacao e Dados experimentais o leem de la. #}
+{% block content %}
+<div class="cabecalho-pagina">
+  <div>
+    <h1>{{ _('mass.title') }}</h1>
+    <p class="lead">{{ _('mass.lead') }}</p>
+  </div>
+</div>
+
+<div class="colunas">
+  <div class="coluna">
+    <section class="card">
+      <h2><span class="numero">1</span>{{ _('mass.seq.title') }}</h2>
+      <textarea id="seq" class="sequencia" spellcheck="false" autocomplete="off"
+                placeholder="{{ _('mass.seq.placeholder') }}"></textarea>
+      <div class="estado" id="seq-estado" aria-live="polite"></div>
+      <div class="row centro" style="margin-top:10px">
+        <button type="button" id="btn-definir" hidden><svg class="icone" aria-hidden="true"><use href="#i-mais"/></svg><span></span></button>
+        <span class="spacer"></span>
+        <button type="button" class="ghost pequeno" id="btn-fasta"><svg class="icone" aria-hidden="true"><use href="#i-abrir"/></svg>{{ _('mass.seq.fasta') }}</button>
+        <input type="file" id="fasta-arquivo" accept=".fasta,.fa,.faa,.txt" hidden>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2><span class="numero">2</span>{{ _('mass.mods.title') }}</h2>
+      <div class="row">
+        <label class="campo cresce">
+          <span>{{ _('mass.mods.nterm') }}</span>
+          <select id="nterm">
+            <option value="">{{ _('common.none') }}</option>
+            {% for name in nterm_mods %}<option value="{{ name }}">{{ name }}</option>{% endfor %}
+          </select>
+        </label>
+        <label class="campo cresce">
+          <span>{{ _('mass.mods.cterm') }}</span>
+          <select id="cterm">
+            <option value="">{{ _('common.none') }}</option>
+            {% for name in cterm_mods %}<option value="{{ name }}">{{ name }}</option>{% endfor %}
+          </select>
+        </label>
+      </div>
+      <div class="grupo" style="margin-top:16px">
+        <p class="grupo-titulo">{{ _('mass.mods.residue') }}</p>
+        <ul class="lista-chips" id="rmods"></ul>
+        <div class="row" style="margin-top:10px">
+          <button type="button" class="ghost pequeno" id="btn-add-rmod"><svg class="icone" aria-hidden="true"><use href="#i-mais"/></svg>{{ _('mass.mods.add') }}</button>
+          <button type="button" class="ghost pequeno" id="btn-clear-rmods">{{ _('mass.mods.clear') }}</button>
+        </div>
+      </div>
+      <p class="hint">{{ _('mass.mods.hint') }} <a href="{{ url_for('pages.library') }}">{{ _('nav.library') }}</a></p>
+    </section>
+
+    <section class="card">
+      <h2><span class="numero">3</span>{{ _('mass.saved.title') }}</h2>
+      <select id="salvos">
+        {% for name in peptides %}<option value="{{ name }}">{{ name }}</option>{% endfor %}
+      </select>
+      <div class="row" style="margin-top:12px">
+        <button type="button" class="ghost pequeno" id="btn-carregar"><svg class="icone" aria-hidden="true"><use href="#i-abrir"/></svg>{{ _('mass.saved.load') }}</button>
+        <button type="button" class="ghost pequeno" id="btn-salvar"><svg class="icone" aria-hidden="true"><use href="#i-salvar"/></svg>{{ _('mass.saved.save') }}</button>
+        <button type="button" class="danger pequeno" id="btn-remover"><svg class="icone" aria-hidden="true"><use href="#i-lixeira"/></svg>{{ _('common.remove') }}</button>
+      </div>
+      <div class="estado" id="salvos-estado" aria-live="polite"></div>
+    </section>
+  </div>
+
+  <div class="coluna">
+    <section class="card">
+      <p class="rotulo-resultado">{{ _('mass.res.mono') }}</p>
+      <div class="massa-grande"><span id="res-mono">-</span><small>Da</small></div>
+      <dl class="kv">
+        <dt>{{ _('mass.res.avg') }}</dt><dd id="res-avg">-</dd>
+        <dt>{{ _('mass.res.formula') }}</dt><dd class="mono" id="res-formula">-</dd>
+        <dt>{{ _('mass.res.residues') }}</dt><dd id="res-residuos">-</dd>
+      </dl>
+      <div class="notice warn" id="res-avisos" style="margin-top:14px" hidden></div>
+    </section>
+
+    <section class="card">
+      <h2>{{ _('mass.charges.title') }}</h2>
+      <div class="row">
+        <label class="campo curto"><span>{{ _('mass.charges.from') }}</span><input type="number" id="zmin" min="1" max="200" value="1"></label>
+        <label class="campo curto"><span>{{ _('mass.charges.to') }}</span><input type="number" id="zmax" min="1" max="200" value="10"></label>
+        <label class="campo cresce"><span>{{ _('mass.charges.extra') }}</span><input type="text" id="zextra" value="15, 20" placeholder="15, 20"></label>
+        <button type="button" class="ghost" data-copiar="tab-cargas" title="{{ _('common.copy_table') }}"><svg class="icone" aria-hidden="true"><use href="#i-copiar"/></svg>{{ _('common.copy') }}</button>
+      </div>
+      <div class="table-wrap media" style="margin-top:14px">
+        <table id="tab-cargas">
+          <thead><tr><th class="num" data-sort="num">z</th><th class="num mz" data-sort="num">m/z</th></tr></thead>
+          <tbody><tr><td colspan="2" class="vazio">{{ _('mass.empty') }}</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>{{ _('mass.iso.title') }}</h2>
+      <div class="row centro">
+        <label class="campo medio"><span>{{ _('mass.iso.charge') }}</span><input type="number" id="iso-z" min="0" max="100" value="0"></label>
+        <label class="marca simples" style="margin-top:20px"><input type="checkbox" id="iso-rotulos" checked>{{ _('chart.labels') }}</label>
+      </div>
+      <p class="hint">{{ _('mass.iso.hint') }}</p>
+      <div class="grafico" id="graf-iso" style="margin-top:12px"></div>
+    </section>
+  </div>
+</div>
+{% endblock %}
+
+{% block dialogs %}
+{% include "_dialogs.html" %}
+
+{# Modificacao num residuo: posicao + modificacao (os dois QInputDialog). #}
+<dialog class="janela" id="dlg-rmod">
+  <form method="dialog">
+    <div class="janela-topo"><h2>{{ _('mass.rmod.title') }}</h2></div>
+    <div class="janela-corpo">
+      <label class="campo"><span>{{ _('mass.rmod.position') }}</span><select id="rmod-pos"></select></label>
+      <label class="campo"><span>{{ _('mass.rmod.mod') }}</span><select id="rmod-mod"></select></label>
+      <p class="previa" id="rmod-info">-</p>
+    </div>
+    <div class="janela-rodape">
+      <button type="button" class="ghost" data-fechar>{{ _('common.cancel') }}</button>
+      <button type="button" id="rmod-ok">{{ _('common.add') }}</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="janela" id="dlg-salvar">
+  <form method="dialog">
+    <div class="janela-topo"><h2>{{ _('mass.saved.save_title') }}</h2></div>
+    <div class="janela-corpo">
+      <label class="campo"><span>{{ _('common.name') }}</span><input type="text" id="salvar-nome" autocomplete="off"></label>
+      <div class="estado bad" id="salvar-erro"></div>
+    </div>
+    <div class="janela-rodape">
+      <button type="button" class="ghost" data-fechar>{{ _('common.cancel') }}</button>
+      <button type="button" id="salvar-ok">{{ _('common.save') }}</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="janela" id="dlg-fasta">
+  <form method="dialog">
+    <div class="janela-topo"><h2>{{ _('mass.fasta.title') }}</h2></div>
+    <div class="janela-corpo">
+      <label class="campo"><span>{{ _('mass.fasta.entries') }}</span><select id="fasta-entradas" size="8"></select></label>
+    </div>
+    <div class="janela-rodape">
+      <button type="button" class="ghost" data-fechar>{{ _('common.cancel') }}</button>
+      <button type="button" id="fasta-ok">{{ _('mass.fasta.use') }}</button>
+    </div>
+  </form>
+</dialog>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/plotly-3.1.0.min.js') }}"></script>
+<script src="{{ url_for('static', filename='peptmass.js') }}"></script>
+<script src="{{ url_for('static', filename='mass.js') }}"></script>
+{% endblock %}

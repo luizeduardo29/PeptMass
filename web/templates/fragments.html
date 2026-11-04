@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block page_class %} page-larga{% endblock %}
+
+{# Aba 2 do desktop (FragmentTab): opcoes a esquerda; tabela, exportacao e
+   espectro teorico a direita. O peptideo vem da tela de Massa. #}
+{% block content %}
+<div class="cabecalho-pagina">
+  <div>
+    <h1>{{ _('frag.title') }}</h1>
+    <p class="lead">{{ _('frag.lead') }}</p>
+  </div>
+</div>
+
+<div class="colunas estreita">
+  <div class="coluna">
+    <section class="card">
+      <h2>{{ _('peptide.card') }}<span class="spacer"></span><a class="btn ghost pequeno" href="{{ url_for('pages.mass') }}">{{ _('peptide.edit') }}</a></h2>
+      <div id="peptideo-resumo"><p class="muted">{{ _('peptide.none') }}</p></div>
+    </section>
+
+    <section class="card">
+      <div class="grupo">
+        <p class="grupo-titulo">{{ _('frag.ions') }}</p>
+        <div class="marcas" id="f-ions">
+          {% for ion in ['a', 'b', 'c', 'x', 'y', 'z', 'z+1'] %}
+          <label class="marca"><input type="checkbox" value="{{ ion }}"{% if ion in ('b', 'y') %} checked{% endif %}>{{ 'z+1 (z•)' if ion == 'z+1' else ion }}</label>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="grupo">
+        <p class="grupo-titulo">{{ _('frag.losses') }}</p>
+        <div class="marcas" id="f-perdas">
+          <label class="marca"><input type="checkbox" id="f-sem-perda" checked>{{ _('frag.no_loss') }}</label>
+          {% for nl in ['-NH3', '-H2O', '-CO'] %}
+          <label class="marca"><input type="checkbox" value="{{ nl }}">{{ nl }}</label>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="grupo">
+        <p class="grupo-titulo">{{ _('frag.charges') }}</p>
+        <div class="marcas" id="f-cargas">
+          {% for z in range(1, 6) %}
+          <label class="marca"><input type="checkbox" value="{{ z }}"{% if z == 1 %} checked{% endif %}>+{{ z }}</label>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>{{ _('frag.match.title') }}</h2>
+      <textarea id="f-exp" class="mono" placeholder="{{ _('frag.match.placeholder') }}"></textarea>
+      <div class="row" style="margin-top:12px">
+        <label class="campo medio"><span>{{ _('common.tolerance') }}</span><input type="number" id="f-tol" min="0.0001" step="0.0001" value="0.02"></label>
+        <label class="marca simples" style="margin-bottom:10px"><input type="checkbox" id="f-ppm">ppm</label>
+        <span class="spacer"></span>
+        <button type="button" id="f-casar">{{ _('frag.match.run') }}</button>
+      </div>
+      <div id="f-casamentos" style="margin-top:14px"></div>
+    </section>
+  </div>
+
+  <div class="coluna">
+    <section class="card">
+      <div class="toolbar">
+        <input type="search" id="f-busca" placeholder="{{ _('frag.search') }}">
+        <button type="button" class="ghost pequeno" data-copiar="tab-fragmentos"><svg class="icone" aria-hidden="true"><use href="#i-copiar"/></svg>{{ _('common.copy') }}</button>
+        <span class="separador"></span>
+        {% for fmt, rotulo in [('csv', 'CSV'), ('xlsx', 'Excel'), ('pdf', 'PDF'), ('txt', 'TXT'), ('skyline', 'Skyline')] %}
+        <button type="button" class="ghost pequeno" data-exportar="{{ fmt }}" title="{{ _('frag.export.help') }}"><svg class="icone" aria-hidden="true"><use href="#i-baixar"/></svg>{{ rotulo }}</button>
+        {% endfor %}
+      </div>
+      <div class="table-wrap alta">
+        <table id="tab-fragmentos">
+          <thead>
+            <tr>
+              <th data-sort="text">{{ _('frag.col.ion') }}</th>
+              <th class="num" data-sort="num">z</th>
+              <th class="num mz" data-sort="num">m/z</th>
+              <th data-sort="text">{{ _('frag.col.loss') }}</th>
+              <th class="num" data-sort="num">{{ _('frag.col.neutral') }}</th>
+              <th data-sort="text">{{ _('frag.col.seq') }}</th>
+            </tr>
+          </thead>
+          <tbody><tr><td colspan="6" class="vazio">{{ _('peptide.none') }}</td></tr></tbody>
+        </table>
+      </div>
+      <p class="hint" id="f-contagem"></p>
+    </section>
+
+    <section class="card">
+      <h2>{{ _('frag.spectrum') }}<span class="spacer"></span><label class="marca simples"><input type="checkbox" id="f-rotulos" checked>{{ _('chart.labels') }}</label></h2>
+      <div class="grafico" id="graf-espectro"></div>
+    </section>
+  </div>
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/plotly-3.1.0.min.js') }}"></script>
+<script src="{{ url_for('static', filename='peptmass.js') }}"></script>
+<script src="{{ url_for('static', filename='fragments.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,85 @@
+{# Janelas compartilhadas (Massa e Biblioteca): novo aminoacido, nova
+   modificacao e busca no PubChem - os QDialog do desktop. O comportamento esta
+   em static/peptmass.js (PM.residueDialog, PM.modDialog, PM.pubchemDialog). #}
+<dialog class="janela" id="dlg-residuo">
+  <form method="dialog">
+    <div class="janela-topo"><h2 id="residuo-titulo">{{ _('dlg.residue.title') }}</h2></div>
+    <div class="janela-corpo">
+      <label class="campo"><span>{{ _('common.name') }}</span><input type="text" id="residuo-nome" autocomplete="off"></label>
+      <div class="row">
+        <label class="campo cresce"><span>{{ _('dlg.residue.three') }}</span><input type="text" id="residuo-abrev" autocomplete="off"></label>
+        <label class="campo cresce"><span>{{ _('dlg.residue.code') }}</span><input type="text" id="residuo-codigo" maxlength="10" autocomplete="off" placeholder="{{ _('dlg.residue.code_ph') }}"></label>
+      </div>
+      <label class="campo"><span>{{ _('dlg.residue.formula') }}</span><input type="text" id="residuo-formula" class="mono" autocomplete="off" placeholder="{{ _('dlg.residue.formula_ph') }}"></label>
+      <button type="button" class="ghost" id="residuo-pubchem"><svg class="icone" aria-hidden="true"><use href="#i-busca"/></svg>{{ _('dlg.pubchem.open') }}</button>
+      <p class="previa" id="residuo-previa">{{ _('dlg.residue.preview_empty') }}</p>
+      <div class="estado bad" id="residuo-erro"></div>
+    </div>
+    <div class="janela-rodape">
+      <button type="button" class="ghost" data-fechar>{{ _('common.cancel') }}</button>
+      <button type="button" id="residuo-ok">{{ _('common.save') }}</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="janela" id="dlg-mod">
+  <form method="dialog">
+    <div class="janela-topo"><h2>{{ _('dlg.mod.title') }}</h2></div>
+    <div class="janela-corpo">
+      <label class="campo"><span>{{ _('common.name') }}</span><input type="text" id="mod-nome" autocomplete="off"></label>
+      <label class="campo"><span>{{ _('dlg.mod.formula') }}</span><input type="text" id="mod-formula" class="mono" autocomplete="off" placeholder="{{ _('dlg.mod.formula_ph') }}"></label>
+      <div class="row">
+        <label class="campo medio"><span>{{ _('dlg.mod.position') }}</span>
+          <select id="mod-posicao">
+            <option value="residue">{{ _('position.residue') }}</option>
+            <option value="N-term">{{ _('position.N-term') }}</option>
+            <option value="C-term">{{ _('position.C-term') }}</option>
+          </select>
+        </label>
+        <label class="campo cresce"><span>{{ _('dlg.mod.targets') }}</span><input type="text" id="mod-alvos" autocomplete="off" placeholder="{{ _('dlg.mod.targets_ph') }}"></label>
+      </div>
+      <button type="button" class="ghost" id="mod-pubchem"><svg class="icone" aria-hidden="true"><use href="#i-busca"/></svg>{{ _('dlg.pubchem.open_formula') }}</button>
+      <p class="previa" id="mod-previa">{{ _('dlg.mod.preview_empty') }}</p>
+      <div class="estado bad" id="mod-erro"></div>
+    </div>
+    <div class="janela-rodape">
+      <button type="button" class="ghost" data-fechar>{{ _('common.cancel') }}</button>
+      <button type="button" id="mod-ok">{{ _('common.save') }}</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="janela larga" id="dlg-pubchem">
+  <form method="dialog">
+    <div class="janela-topo"><h2>{{ _('dlg.pubchem.title') }}</h2></div>
+    <div class="janela-corpo">
+      <div class="row">
+        <label class="campo medio"><span>{{ _('dlg.pubchem.kind') }}</span>
+          <select id="pubchem-tipo">
+            <option value="name">{{ _('dlg.pubchem.kind.name') }}</option>
+            <option value="cid">CID</option>
+            <option value="formula">{{ _('dlg.pubchem.kind.formula') }}</option>
+          </select>
+        </label>
+        <label class="campo cresce"><span>{{ _('dlg.pubchem.query') }}</span><input type="search" id="pubchem-termo" autocomplete="off" placeholder="{{ _('dlg.pubchem.query_ph') }}"></label>
+        <button type="button" id="pubchem-buscar"><svg class="icone" aria-hidden="true"><use href="#i-busca"/></svg>{{ _('common.search') }}</button>
+      </div>
+      <div class="estado" id="pubchem-estado">{{ _('dlg.pubchem.hint') }}</div>
+      <div class="pubchem-corpo">
+        <div class="pubchem-img" id="pubchem-img"></div>
+        <dl class="kv">
+          <dt>{{ _('dlg.pubchem.iupac') }}</dt><dd id="pubchem-iupac">-</dd>
+          <dt>CID</dt><dd id="pubchem-cid">-</dd>
+          <dt>{{ _('dlg.pubchem.formula') }}</dt><dd class="mono" id="pubchem-formula">-</dd>
+          <dt>{{ _('dlg.pubchem.mono_pm') }}</dt><dd id="pubchem-mono">-</dd>
+          <dt>{{ _('dlg.pubchem.mono_pc') }}</dt><dd id="pubchem-mono-pc">-</dd>
+          <dt>{{ _('dlg.pubchem.avg') }}</dt><dd id="pubchem-media">-</dd>
+        </dl>
+      </div>
+    </div>
+    <div class="janela-rodape">
+      <button type="button" class="ghost" data-fechar>{{ _('common.cancel') }}</button>
+      <button type="button" id="pubchem-usar" disabled>{{ _('dlg.pubchem.use') }}</button>
+    </div>
+  </form>
+</dialog>

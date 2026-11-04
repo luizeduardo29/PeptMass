@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ _('error.title') }}</h1>
+<div class="notice bad">{{ message }}</div>
+<p><a class="btn ghost" href="{{ url_for('pages.home') }}">{{ _('common.back_home') }}</a></p>
+{% endblock %}

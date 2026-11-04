@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Ambientes e dependencias locais
+.venv/
+.venv-build/
+venv/
+.runtime/
+
+# Empacotamento
+build/
+dist/
+
+# Ferramenta externa (binario de terceiros, baixado a parte)
+ThermoRawFileParser/
+
+# Segredos e logs
+.env
+*.log

@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block page_class %} page-larga{% endblock %}
+
+{# Tela inicial no formato da Hub (DegradationFinder / DopingValidation):
+   marca, titulo, indicadores, "O que voce quer fazer?" e a biblioteca de
+   peptideos salvos, cada um abrindo na tela de Massa. #}
+{% block content %}
+<section class="inicio-topo">
+  {% with logo_class='inicio-logo' %}{% include "_logo.html" %}{% endwith %}
+</section>
+
+<div class="inicio-indicadores">
+  <div class="indicador">
+    <h4>{{ _('home.stat.peptides') }}</h4>
+    <div class="valor">{{ stats.peptides }}</div>
+    <p>{{ _('home.stat.peptides_sub') }}</p>
+  </div>
+  <div class="indicador">
+    <h4>{{ _('home.stat.residues') }}</h4>
+    <div class="valor">{{ stats.residues }}</div>
+    <p>{{ _('home.stat.residues_sub', n=stats.residues_builtin) }}</p>
+  </div>
+  <div class="indicador">
+    <h4>{{ _('home.stat.mods') }}</h4>
+    <div class="valor">{{ stats.mods }}</div>
+    <p>{{ _('home.stat.mods_sub', n=stats.mods_custom) }}</p>
+  </div>
+</div>
+
+<h3 class="inicio-secao">{{ _('home.what') }}</h3>
+<div class="inicio-acoes">
+  <section class="card acao">
+    <h4 class="acao-titulo"><svg class="icone" aria-hidden="true"><use href="#i-massa"/></svg>{{ _('nav.mass') }}</h4>
+    <p class="acao-texto">{{ _('home.action.mass') }}</p>
+    <a class="btn btn-bloco" href="{{ url_for('pages.mass') }}">{{ _('home.action.mass_btn') }}</a>
+  </section>
+  <section class="card acao">
+    <h4 class="acao-titulo"><svg class="icone" aria-hidden="true"><use href="#i-fragmentos"/></svg>{{ _('nav.fragments') }}</h4>
+    <p class="acao-texto">{{ _('home.action.fragments') }}</p>
+    <a class="btn ghost btn-bloco" href="{{ url_for('pages.fragments') }}">{{ _('home.action.fragments_btn') }}</a>
+  </section>
+  <section class="card acao">
+    <h4 class="acao-titulo"><svg class="icone" aria-hidden="true"><use href="#i-experimental"/></svg>{{ _('nav.experimental') }}</h4>
+    <p class="acao-texto">{{ _('home.action.experimental') }}</p>
+    <a class="btn ghost btn-bloco" href="{{ url_for('pages.experimental') }}">{{ _('home.action.experimental_btn') }}</a>
+  </section>
+  <section class="card acao">
+    <h4 class="acao-titulo"><svg class="icone" aria-hidden="true"><use href="#i-biblioteca"/></svg>{{ _('nav.library') }}</h4>
+    <p class="acao-texto">{{ _('home.action.library') }}</p>
+    <a class="btn ghost btn-bloco" href="{{ url_for('pages.library') }}">{{ _('home.action.library_btn') }}</a>
+  </section>
+</div>
+
+<div class="cabecalho-pagina inicio-secao">
+  <div>
+    <h3 style="margin:0">{{ _('home.saved') }}</h3>
+    <p class="hint">{{ _('home.saved_help') }}</p>
+  </div>
+  <input type="search" id="busca-peptideos" data-busca="tabela-peptideos" placeholder="{{ _('home.saved_search') }}" style="max-width:320px">
+</div>
+{% if peptides %}
+<div class="table-wrap">
+  <table class="tabela-simples" id="tabela-peptideos" style="border:0;box-shadow:none;border-radius:0">
+    <thead>
+      <tr>
+        <th>{{ _('home.col.name') }}</th>
+        <th>{{ _('home.col.sequence') }}</th>
+        <th>{{ _('home.col.mods') }}</th>
+        <th class="num">{{ _('home.col.mono') }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in peptides %}
+      <tr data-busca-nome="{{ p.name }} {{ p.sequence }}">
+        <td class="destaque"><a href="{{ url_for('pages.mass', peptide=p.name) }}">{{ p.name }}</a></td>
+        <td class="mono quebra" title="{{ p.sequence }}">{{ p.sequence | truncate(48, True, '…') }}</td>
+        <td class="muted">
+          {%- set partes = [] -%}
+          {%- if p.nterm %}{% set _u = partes.append('N: ' ~ p.nterm) %}{% endif -%}
+          {%- if p.cterm %}{% set _u = partes.append('C: ' ~ p.cterm) %}{% endif -%}
+          {%- if p.n_mods %}{% set _u = partes.append(_('home.mods_residue', n=p.n_mods)) %}{% endif -%}
+          {{ partes | join(' · ') if partes else '-' }}
+        </td>
+        <td class="num">{{ '%.4f' | format(p.mono) if p.mono is not none else '-' }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<p class="vazio" data-busca-vazio="tabela-peptideos" hidden>{{ _('home.saved_none_found') }}</p>
+{% else %}
+<p class="muted">{{ _('home.saved_empty') }}</p>
+{% endif %}
+{% endblock %}

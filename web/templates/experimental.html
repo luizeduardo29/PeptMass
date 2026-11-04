@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block page_class %} page-larga{% endblock %}
+
+{# Aba 3 do desktop (ExperimentalTab): abrir mzML/mzXML/.raw, filtro de scan,
+   cromatograma (TIC/XIC) clicavel, espectro do scan anotado contra as series
+   do peptideo da tela de Massa, escore de Morpheus e criterios WADA. #}
+{% block content %}
+<div class="cabecalho-pagina">
+  <div>
+    <h1>{{ _('ms.title') }}</h1>
+    <p class="lead">{{ _('ms.lead') }}</p>
+  </div>
+</div>
+
+<section class="card">
+  <h2><span class="numero">1</span>{{ _('ms.file.title') }}</h2>
+  <form id="ms-form" class="row">
+    <label class="campo cresce"><span>{{ _('ms.file.label') }}</span><input type="file" id="ms-arquivo" accept=".mzML,.mzml,.mzXML,.mzxml,.raw"></label>
+    <label class="marca simples" style="margin-bottom:10px" title="{{ _('ms.file.profile_help') }}"><input type="checkbox" id="ms-perfil">{{ _('ms.file.profile') }}</label>
+    <button type="submit" id="ms-abrir"><svg class="icone" aria-hidden="true"><use href="#i-enviar"/></svg>{{ _('ms.file.open') }}</button>
+  </form>
+  <div class="progress" id="ms-progresso" style="margin-top:12px" hidden><i></i></div>
+  <div class="estado" id="ms-estado">{{ _('ms.file.none') }}</div>
+  <div class="row" id="ms-selecao" style="margin-top:6px" hidden>
+    <label class="campo medio"><span>{{ _('ms.level') }}</span><select id="ms-nivel"></select></label>
+    <label class="campo cresce"><span>{{ _('ms.filter') }}</span><select id="ms-filtro"></select></label>
+    <label class="marca simples" style="margin-bottom:10px"><input type="checkbox" id="ms-agrupar" checked>{{ _('ms.group') }}</label>
+  </div>
+</section>
+
+<section class="card">
+  <h2><span class="numero">2</span>{{ _('ms.chrom.title') }}</h2>
+  <div class="row">
+    <button type="button" class="ghost" id="ms-tic">TIC</button>
+    <label class="campo medio"><span>XIC m/z</span><input type="number" id="ms-xic-mz" step="0.0001" placeholder="{{ _('ms.xic.placeholder') }}"></label>
+    <label class="campo curto"><span>± Da</span><input type="number" id="ms-xic-tol" min="0.0001" max="10" step="0.001" value="0.02"></label>
+    <button type="button" class="ghost" id="ms-xic">{{ _('ms.xic.show') }}</button>
+  </div>
+  <p class="hint">{{ _('ms.chrom.hint') }}</p>
+  <div class="grafico baixo" id="graf-crom" style="margin-top:10px"></div>
+</section>
+
+<section class="card">
+  <h2><span class="numero">3</span>{{ _('ms.scan.title') }}<span class="spacer"></span><span class="tag na" id="ms-scan-rotulo">{{ _('ms.scan.none') }}</span></h2>
+  <div id="ms-sem-peptideo" class="notice warn" hidden>{{ _('ms.need_peptide') }} <a href="{{ url_for('pages.mass') }}">{{ _('nav.mass') }}</a></div>
+  <div class="grid two">
+    <div>
+      <div class="grupo">
+        <p class="grupo-titulo">{{ _('ms.series') }}</p>
+        <div class="marcas" id="ms-series">
+          {% for ion in ['a', 'b', 'c', 'x', 'y', 'z'] %}
+          <label class="marca"><input type="checkbox" value="{{ ion }}"{% if ion in ('b', 'y') %} checked{% endif %}>{{ ion }}</label>
+          {% endfor %}
+          <label class="marca"><input type="checkbox" id="ms-perdas">{{ _('ms.losses') }}</label>
+        </div>
+      </div>
+      <div class="grupo">
+        <p class="grupo-titulo">{{ _('ms.charges') }}</p>
+        <div class="marcas" id="ms-cargas">
+          {% for z in (1, 2, 3) %}
+          <label class="marca"><input type="checkbox" value="{{ z }}"{% if z in (1, 2) %} checked{% endif %}>+{{ z }}</label>
+          {% endfor %}
+          <label class="marca" title="{{ _('ms.profile_view_help') }}"><input type="checkbox" id="ms-ver-perfil">{{ _('ms.profile_view') }}</label>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="row">
+        <label class="campo medio"><span>{{ _('common.tolerance') }}</span><input type="number" id="ms-tol" min="0.0001" step="0.1" value="10"></label>
+        <label class="marca simples" style="margin-bottom:10px"><input type="checkbox" id="ms-ppm" checked>ppm</label>
+        <label class="campo curto"><span>{{ _('ms.prec_charge') }}</span><input type="number" id="ms-carga-prec" min="1" max="20" value="2"></label>
+      </div>
+      <div class="row">
+        <label class="campo medio"><span>{{ _('ms.rt_expected') }}</span><input type="number" id="ms-rt" min="0" step="0.01" placeholder="-"></label>
+        <label class="campo curto"><span>{{ _('ms.rt_window') }}</span><input type="number" id="ms-rt-janela" min="0.01" step="0.01" value="0.20"></label>
+        <span class="spacer"></span>
+        <button type="button" id="ms-casar" disabled>{{ _('ms.match') }}</button>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:16px">
+    <p class="grupo-titulo">{{ _('ms.criteria') }}</p>
+    <div class="criterios" id="ms-criterios"><span class="muted">-</span></div>
+  </div>
+  <div class="grafico alto" id="graf-scan" style="margin-top:14px"></div>
+  <p class="linha-escore" id="ms-escore">-</p>
+  <div class="toolbar" style="margin-top:14px">
+    <span class="hint" style="margin:0">{{ _('ms.table_hint') }}</span>
+    <span class="spacer"></span>
+    <button type="button" class="ghost pequeno" data-copiar="tab-anotacao"><svg class="icone" aria-hidden="true"><use href="#i-copiar"/></svg>{{ _('common.copy') }}</button>
+  </div>
+  <div class="table-wrap media">
+    <table id="tab-anotacao">
+      <thead>
+        <tr>
+          <th class="num mz" data-sort="num">{{ _('ms.col.exp') }}</th>
+          <th data-sort="text">{{ _('frag.col.ion') }}</th>
+          <th class="num" data-sort="num">z</th>
+          <th class="num mz" data-sort="num">{{ _('ms.col.theo') }}</th>
+          <th class="num" data-sort="num">{{ _('ms.col.error') }}</th>
+          <th class="num" data-sort="num">{{ _('ms.col.abund') }}</th>
+          <th data-sort="text">{{ _('ms.col.subseq') }}</th>
+        </tr>
+      </thead>
+      <tbody><tr><td colspan="7" class="vazio">-</td></tr></tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/plotly-3.1.0.min.js') }}"></script>
+<script src="{{ url_for('static', filename='peptmass.js') }}"></script>
+<script src="{{ url_for('static', filename='experimental.js') }}"></script>
+{% endblock %}

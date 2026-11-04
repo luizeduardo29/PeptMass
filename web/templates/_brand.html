@@ -1,0 +1,12 @@
+{# Nome do produto como os da Hub ("Dopin" + "GPT", "Degradation" + "Finder"):
+   a primeira parte no tom do texto, o resto na cor de marca. Sem espaco o
+   nome se parte na ULTIMA maiuscula (Pept|Mass); com espaco, no espaco. #}
+{%- set titulo = _('app.title') -%}
+{%- if ' ' in titulo -%}
+  {%- set partes = titulo.split(' ', 1) -%}
+{{ partes[0] }} <span>{{ partes[1] }}</span>
+{%- else -%}
+  {%- set ns = namespace(corte=0) -%}
+  {%- for letra in titulo -%}{%- if loop.index0 > 0 and letra.isupper() -%}{%- set ns.corte = loop.index0 -%}{%- endif -%}{%- endfor -%}
+  {%- if ns.corte -%}{{ titulo[:ns.corte] }}<span>{{ titulo[ns.corte:] }}</span>{%- else -%}{{ titulo }}{%- endif -%}
+{%- endif -%}
