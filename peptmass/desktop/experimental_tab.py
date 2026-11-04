@@ -13,7 +13,6 @@ from PyQt6.QtWidgets import (
 
 from peptmass.core import identification
 from peptmass.core import scoring
-from peptmass.core.constants import PROTON_MASS
 from peptmass.core.fragmentation import generate_fragments, match_experimental
 from peptmass.core.i18n import t as _
 from peptmass.desktop.widgets import NumericItem, copy_table_selection, make_table

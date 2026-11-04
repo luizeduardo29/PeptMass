@@ -2,7 +2,7 @@
 """
 run_web.py
 ==========
-Sobe o PeptMass web (Flask). O desktop continua em main.py.
+Sobe o PeptMass web (Flask). O desktop fica em run_desktop.py.
 
     python run_web.py                 # http://127.0.0.1:8010
     python run_web.py --host 0.0.0.0 --port 8010

@@ -1,0 +1,7 @@
+# Dependências apenas para empacotar o PeptMass (não são necessárias para rodar
+# via `python run_desktop.py`).
+#
+#   pip install -r requirements/build.txt
+#
+-r desktop.txt
+pyinstaller>=6.0

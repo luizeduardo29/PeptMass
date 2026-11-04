@@ -1,5 +1,5 @@
 # PeptMass web (run_web.py / container). Sem PyQt6 e sem matplotlib:
-# os graficos sao desenhados no navegador (Plotly local em web/static/vendor).
+# os graficos sao desenhados no navegador (Plotly local em peptmass/web/static/vendor).
 Flask>=3.0
 waitress>=3.0
 openpyxl>=3.1

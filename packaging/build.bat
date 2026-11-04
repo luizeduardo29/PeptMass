@@ -3,15 +3,15 @@ REM ===========================================================================
 REM build.bat - Empacota o PeptMass num executavel Windows com PyInstaller.
 REM
 REM Uso (prompt de comando) ou duplo-clique no Explorer:
-REM     build.bat              build onedir em dist\PeptMass\PeptMass.exe
-REM     build.bat onefile      build onefile  em dist\PeptMass.exe
-REM     build.bat novenv       usa o Python atual sem criar venv
-REM     build.bat onefile novenv   combina as duas opcoes
+REM     packaging\build.bat              build onedir em dist\PeptMass\PeptMass.exe
+REM     packaging\build.bat onefile      build onefile  em dist\PeptMass.exe
+REM     packaging\build.bat novenv       usa o Python atual sem criar venv
+REM     packaging\build.bat onefile novenv   combina as duas opcoes
 REM ===========================================================================
 setlocal EnableExtensions
 
-REM Trabalha sempre na pasta deste .bat
-cd /d "%~dp0"
+REM Trabalha sempre na raiz do projeto
+cd /d "%~dp0.."
 
 set "ONEFILE=0"
 set "USEVENV=1"
@@ -32,19 +32,19 @@ if "%USEVENV%"=="1" (
         python -m venv .venv-build
         if errorlevel 1 goto fail
     )
-    set "PYTHON=%~dp0.venv-build\Scripts\python.exe"
+    set "PYTHON=%CD%\.venv-build\Scripts\python.exe"
 )
 
 echo ==^> Instalando dependencias...
 "%PYTHON%" -m pip install --upgrade pip
 if errorlevel 1 goto fail
-"%PYTHON%" -m pip install -r requirements.txt -r requirements-build.txt
+"%PYTHON%" -m pip install -r requirements\build.txt
 if errorlevel 1 goto fail
 
 echo ==^> Rodando a suite cientifica ^(rede de seguranca^)...
-"%PYTHON%" test_suite.py
+"%PYTHON%" tests\test_science.py
 if errorlevel 1 (
-    echo ERRO: test_suite.py falhou - build abortado.
+    echo ERRO: test_science.py falhou - build abortado.
     goto fail
 )
 
@@ -55,7 +55,7 @@ if "%ONEFILE%"=="1" (
 )
 
 echo ==^> Empacotando com PyInstaller...
-"%PYTHON%" -m PyInstaller peptmass.spec --noconfirm --clean
+"%PYTHON%" -m PyInstaller packaging\peptmass.spec --noconfirm --clean
 if errorlevel 1 goto fail
 
 echo.

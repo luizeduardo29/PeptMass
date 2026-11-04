@@ -3,7 +3,7 @@ presets.py
 ==========
 Peptideos pre-carregados na base local na primeira execucao (analogos de
 GLP e controle antidopagem WADA S2). Compartilhado pela interface desktop
-(gui.py) e pela web (web/), por isso nao importa nada de interface.
+(peptmass/desktop) e pela web (peptmass/web), por isso nao importa nada de interface.
 """
 
 # Peptídeos-exemplo semeados na base na primeira execução (análogos de GLP).

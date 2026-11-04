@@ -1,12 +1,12 @@
 @echo off
 REM ===========================================================================
-REM run.bat - Abre o PeptMass usando a venv isolada .venv
+REM run_desktop.bat - Abre o PeptMass usando a venv isolada .venv
 REM
 REM Duplo-clique no Explorer. Na 1a vez, ou se a .venv sumir, ele cria a
 REM venv e instala as dependencias automaticamente; depois so abre o app.
 REM ===========================================================================
 setlocal
-cd /d "%~dp0"
+cd /d "%~dp0.."
 
 set "VPY=.venv\Scripts\python.exe"
 set "VPYW=.venv\Scripts\pythonw.exe"
@@ -18,11 +18,11 @@ python -m venv .venv
 if errorlevel 1 goto novenv
 echo ==^> Instalando dependencias, pode demorar na 1a vez...
 "%VPY%" -m pip install --upgrade pip
-"%VPY%" -m pip install -r requirements.txt
+"%VPY%" -m pip install -r requirements\desktop.txt
 if errorlevel 1 goto nodeps
 
 :run
-start "" "%VPYW%" main.py
+start "" "%VPYW%" run_desktop.py
 goto :eof
 
 :novenv

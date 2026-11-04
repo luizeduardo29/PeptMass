@@ -12,15 +12,12 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-COPY requirements-web.txt /app/
-RUN pip install --no-cache-dir -r requirements-web.txt
+COPY requirements/web.txt /app/
+RUN pip install --no-cache-dir -r web.txt
 
-# So o nucleo de calculo e a web: gui.py (PyQt6) fica de fora.
-COPY constants.py custom_residues.py database.py denovo.py exporters.py \
-     formula_parser.py fragmentation.py i18n.py identification.py \
-     mass_calculator.py modifications.py presets.py pubchem.py scoring.py \
-     spectra_io.py run_web.py test_suite.py /app/
-COPY web/ /app/web/
+# peptmass/desktop (PyQt6) fica de fora pelo .dockerignore.
+COPY peptmass/ /app/peptmass/
+COPY run_web.py /app/
 
 RUN useradd -m -u 1000 peptmass \
     && mkdir -p /data && chown peptmass:peptmass /data

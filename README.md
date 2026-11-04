@@ -13,11 +13,11 @@ aminoácidos não-naturais — com interface moderna e tema claro/escuro.
 Requer **Python 3.10+**.
 
 ```bash
-pip install -r requirements.txt
-python main.py
+pip install -r requirements/desktop.txt
+python run_desktop.py
 ```
 
-Dependências: `PyQt6`, `openpyxl`, `reportlab`, `matplotlib`.
+No Windows, `scripts\run_desktop.bat` cria a venv e abre o programa.
 
 ---
 
@@ -29,9 +29,9 @@ escuro e idiomas **português, inglês e espanhol** (menu do globo no topo).
 Usa o mesmo núcleo de cálculo e o mesmo banco do desktop.
 
 ```bash
-pip install -r requirements-web.txt
+pip install -r requirements/web.txt
 python run_web.py            # http://127.0.0.1:8010
-python test_web.py           # verificação da versão web
+python tests/test_web.py     # verificação da versão web
 ```
 
 Em container:
@@ -42,28 +42,50 @@ docker compose up -d --build # http://localhost:8010 (dados no volume peptmass_d
 
 Telas: **Início**, **Massa** (Aba 1), **Fragmentação** (Aba 2), **Dados
 experimentais** (Aba 3) e **Biblioteca** (aminoácidos não-naturais,
-modificações e PubChem). O código fica em `web/`, e as traduções em
-`web/locales/*.json`. No container, a leitura de `.raw` não está disponível
+modificações e PubChem). O código fica em `peptmass/web/`, e as traduções em
+`peptmass/web/locales/*.json`. No container, a leitura de `.raw` não está disponível
 (o ThermoRawFileParser é um executável Windows); converta o arquivo para mzML antes.
 
 ---
 
-## Arquitetura (módulos)
+## Arquitetura
 
-| Módulo | Função |
-|---|---|
-| `constants.py` | Massas atômicas IUPAC (mono e média), isótopos, aminoácidos naturais |
-| `formula_parser.py` | Parser de fórmulas moleculares (parênteses, multiplicadores, deltas negativos) |
-| `modifications.py` | Biblioteca de modificações pré-definidas e customizadas |
-| `custom_residues.py` | Aminoácidos não-naturais (cálculo automático de massa) |
-| `mass_calculator.py` | Núcleo: parsing de sequência, massas, m/z, distribuição isotópica |
-| `fragmentation.py` | Séries a/b/c/x/y/z, perdas neutras, multicarga, matching experimental |
-| `database.py` | Persistência local em SQLite |
-| `pubchem.py` | Busca de moléculas no PubChem (PUG REST) por nome, CID ou fórmula |
-| `exporters.py` | CSV, XLSX, PDF, TXT, FASTA, lista de transições Skyline |
-| `gui.py` | Interface PyQt6 (2 abas, temas, gráficos) |
-| `main.py` | Ponto de entrada |
-| `test_suite.py` | Validação científica contra valores publicados |
+```text
+peptmass/
+  core/             cálculo científico, sem interface
+    constants.py        massas atômicas, isótopos, aminoácidos naturais
+    formula_parser.py   fórmulas moleculares e massa de composição
+    modifications.py    biblioteca de modificações
+    custom_residues.py  aminoácidos não-naturais
+    mass_calculator.py  sequência, massas, m/z e distribuição isotópica
+    fragmentation.py    séries a/b/c/x/y/z, perdas neutras, matching
+    scoring.py          escore de Morpheus e erro de massa
+    identification.py   carga, ajuste isotópico e critérios de identificação
+    presets.py          peptídeos pré-carregados
+    workspace.py        banco + bibliotecas + calculadora (web e desktop)
+    i18n.py             mensagens do núcleo e do desktop
+  infra/            acesso externo
+    database.py         SQLite local
+    spectra_io.py       mzML, mzXML, .raw e centroidização
+    pubchem.py          PubChem (PUG REST)
+    exporters.py        CSV, XLSX, PDF, TXT, FASTA, Skyline
+  web/              Flask
+    __init__.py         create_app
+    blueprints/         pages.py (telas) e api/ (mass, fragments, library, spectra)
+    templates/  static/  locales/
+  desktop/          PyQt6
+    main_window.py      janela principal
+    mass_tab.py, fragment_tab.py, experimental_tab.py
+tests/              test_science.py, test_web.py, data/
+packaging/          PyInstaller (peptmass.spec, build.bat, build.sh)
+scripts/            atalhos do desktop no Windows
+requirements/       desktop.txt, web.txt, build.txt
+run_web.py          entrada web
+run_desktop.py      entrada desktop
+```
+
+As dependências andam em um sentido: `web` e `desktop` usam `infra` e `core`;
+`infra` usa `core`; `core` não conhece nenhuma interface.
 
 ---
 
@@ -172,38 +194,24 @@ arquivo de dados:
    - **Carga do precursor**: lida do arquivo ou **estimada automaticamente**
      pelo espaçamento do cluster isotópico (deconvolução).
 
-Requer `pyteomics`, `psims` e `lxml` (já em `requirements.txt`). Para abrir
+Requer `pyteomics`, `psims` e `lxml` (já em `requirements/`). Para abrir
 `.raw` diretamente é preciso o **ThermoRawFileParser**: aponte-o pela variável
 de ambiente `PEPTMASS_THERMO_PARSER` (caminho do executável) ou coloque a pasta
 `ThermoRawFileParser/` na raiz do projeto. Sem ele, converta o `.raw` para mzML
 antes (ThermoRawFileParser ou msconvert).
 
-Há um arquivo de teste `exemplo_PEPTIDE.mzML` (sintético, com os íons b/y do
+Há um arquivo de teste `tests/data/exemplo_PEPTIDE.mzML` (sintético, com os íons b/y do
 peptídeo PEPTIDE) para experimentar a aba sem dados próprios.
-
-## ABA 4 — Sequenciamento
-
-A partir de um espectro MS/MS (colado como lista de m/z, ou trazido da Aba 3
-com *"Pegar espectro da Aba 3"*) + o m/z e a carga do precursor:
-
-1. **Identificação por biblioteca** (confiável): pontua o espectro contra os
-   peptídeos salvos, filtrando por compatibilidade de **massa do precursor** e
-   ranqueando por **cobertura de íons b/y**. Diz qual peptídeo conhecido melhor
-   explica o espectro — ideal para a lista de alvos antidopagem.
-2. **De novo** (grafo de espectro): deduz a sequência do zero ligando picos cuja
-   diferença de massa equivale a um resíduo. Best-effort — **Ile/Leu são
-   indistinguíveis** (rótulo `I/L`), Lys/Gln diferem só 0.036 Da, e picos
-   ausentes geram lacunas. Bom em espectros limpos de alta resolução; use a
-   identificação por biblioteca para confirmar.
 
 ---
 
 ## Validação científica
 
-`python test_suite.py` compara os cálculos com valores publicados
+`python tests/test_science.py` compara os cálculos com valores publicados
 (PEPTIDE, bradicinina, angiotensina II, substância P, séries de fragmentos,
-modificações). Todos os 19 testes de referência passam dentro de tolerância
-de ±0.001 Da.
+modificações) e confere os limites dos critérios de identificação. Os 19 testes
+de referência passam dentro de tolerância de ±0.001 Da, e os 12 de critérios
+também passam.
 
 Padrões usados:
 - Massas monoisotópicas IUPAC.
@@ -231,42 +239,35 @@ O PeptMass pode ser empacotado num executável standalone com **PyInstaller**,
 dispensando que o usuário final tenha Python instalado.
 
 ```bash
-pip install -r requirements.txt -r requirements-build.txt
+pip install -r requirements/build.txt
 ```
 
-**Windows** (PowerShell):
-
-```powershell
-./build.ps1            # gera dist/PeptMass/PeptMass.exe (recomendado, onedir)
-./build.ps1 -OneFile   # gera um único dist/PeptMass.exe
-```
-
-**Windows** (Prompt de Comando ou duplo-clique no Explorer):
+**Windows:**
 
 ```bat
-build.bat              :: onedir em dist\PeptMass\PeptMass.exe
-build.bat onefile      :: um único dist\PeptMass.exe
+packaging\build.bat              :: onedir em dist\PeptMass\PeptMass.exe
+packaging\build.bat onefile      :: um único dist\PeptMass.exe
 ```
 
 **macOS / Linux:**
 
 ```bash
-chmod +x build.sh
-./build.sh             # gera dist/PeptMass/ (+ dist/PeptMass.app no macOS)
-./build.sh --onefile   # executável único
+chmod +x packaging/build.sh
+packaging/build.sh             # gera dist/PeptMass/ (+ dist/PeptMass.app no macOS)
+packaging/build.sh --onefile   # executável único
 ```
 
 Ou diretamente, em qualquer plataforma:
 
 ```bash
-pyinstaller peptmass.spec --noconfirm --clean
+pyinstaller packaging/peptmass.spec --noconfirm --clean
 ```
 
 Detalhes:
 
-- A receita está em [`peptmass.spec`](peptmass.spec); os scripts `build.ps1` /
-  `build.sh` criam uma venv de build isolada, rodam `test_suite.py` como
-  rede de segurança e só então empacotam.
+- A receita está em [`packaging/peptmass.spec`](packaging/peptmass.spec); os
+  scripts `build.bat` e `build.sh` criam uma venv de build isolada, rodam
+  `tests/test_science.py` como rede de segurança e só então empacotam.
 - **onedir** (padrão) é mais confiável e tem startup mais rápido; **onefile**
   (`PEPTMASS_ONEFILE=1`) gera um único arquivo, porém com startup mais lento e
   maior chance de falso-positivo de antivírus no Windows.

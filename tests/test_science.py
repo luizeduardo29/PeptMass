@@ -15,6 +15,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from peptmass.core.mass_calculator import MassCalculator  # noqa: E402
 from peptmass.core.fragmentation import generate_fragments  # noqa: E402
+from peptmass.core.identification import evaluate_criteria  # noqa: E402
 from peptmass.core.custom_residues import CustomResidueManager  # noqa: E402
 from peptmass.infra.database import Database  # noqa: E402
 
@@ -28,6 +29,36 @@ def check(label, got, expected, tol=1e-3):
     FAIL += (not ok)
     print(f"  [{'OK ' if ok else 'ERRO'}] {label:34s} "
           f"{got:.6f}  (ref {expected:.6f})")
+
+
+def check_criteria():
+    """Estados de evaluate_criteria nos limites de cada criterio."""
+    mono = 799.359964
+    prec = calc_mz = MassCalculator.mz(mono, 2)
+
+    def states(**kw):
+        args = dict(precursor_mz=prec, charge=2, tolerance=5.0, ppm=True, scan_rt=10.0,
+                    expected_rt=0.0, rt_window=0.2, n_ions=2, envelope_fit=None)
+        args.update(kw)
+        return {c["kind"]: c["state"] for c in evaluate_criteria(mono, **args)}
+
+    def same(label, got, expected):
+        check(label, float(got == expected), 1.0)
+
+    same("precursor dentro da tolerância", states()["precursor"], "ok")
+    same("precursor fora (6 ppm, tol 5)",
+         states(precursor_mz=calc_mz * (1 + 6e-6))["precursor"], "bad")
+    same("precursor em Da usa 20 ppm",
+         states(precursor_mz=calc_mz * (1 + 19e-6), tolerance=0.02, ppm=False)["precursor"], "ok")
+    same("sem precursor no scan", "precursor" in states(precursor_mz=None), False)
+    same("RT não informado", "rt" in states(), False)
+    same("RT no limite da janela", states(expected_rt=10.2)["rt"], "ok")
+    same("RT fora da janela", states(expected_rt=10.5)["rt"], "bad")
+    same("1 íon reprova", states(n_ions=1)["ions"], "bad")
+    same("2 íons aprovam", states(n_ions=2)["ions"], "ok")
+    same("cosseno 0.90 aprova", states(envelope_fit=(0.9, 2))["isotopes"], "ok")
+    same("cosseno 0.89 só avisa", states(envelope_fit=(0.89, 2))["isotopes"], "warn")
+    same("1 isótopo alinhado não avalia", "isotopes" in states(envelope_fit=(0.99, 1)), False)
 
 
 def main():
@@ -81,6 +112,9 @@ def main():
     check("Resíduo Aib (mono)", mgr.get("U").mono_mass, 85.052764)
     check("Aib-Aib-Lys (UUK)", calc2.parse("UUK").mono_mass, 316.211056)
     db.close()
+
+    print("\n• Critérios de identificação:")
+    check_criteria()
 
     print("\n" + "=" * 64)
     print(f"Resultado: {PASS} aprovados, {FAIL} falhas")

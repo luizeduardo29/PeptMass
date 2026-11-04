@@ -14,3 +14,9 @@ ThermoRawFileParser/
 *.bat
 *.ps1
 *.sh
+.git/
+peptmass/desktop/
+tests/
+packaging/
+scripts/
+*.md

@@ -19,7 +19,7 @@ class Database:
         self.path = path
         os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
         # check_same_thread=False: a versao web atende cada requisicao numa
-        # thread; o acesso e serializado por uma trava (web/state.py).
+        # thread; o acesso e serializado por uma trava (peptmass/web/state.py).
         self.conn = sqlite3.connect(path, check_same_thread=False)
         self.conn.row_factory = sqlite3.Row
         self._init_schema()

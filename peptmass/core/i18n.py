@@ -16,7 +16,7 @@ barra de ferramentas troca e aplica ao reabrir.
 import threading
 
 _LANG = "pt"
-# Idioma por thread: a versão web (web/) atende cada requisição numa thread e
+# Idioma por thread: a versão web atende cada requisição numa thread e
 # fixa o idioma dela com use_language(); o desktop usa só o global _LANG.
 _local = threading.local()
 
@@ -353,7 +353,7 @@ _EN = {
 
 # --------------------------------------------------------------------------
 # Português -> Espanhol (só as mensagens do núcleo: cálculo, fórmulas,
-# resíduos e PubChem; a interface web tem o próprio catálogo em web/locales)
+# resíduos e PubChem; a interface web tem o próprio catálogo em peptmass/web/locales)
 # --------------------------------------------------------------------------
 _ES = {
     "Resíduo(s) desconhecido(s): {x}": "Residuo(s) desconocido(s): {x}",

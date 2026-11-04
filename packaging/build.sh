@@ -5,12 +5,12 @@
 # Empacota o PeptMass com PyInstaller (macOS / Linux).
 #
 # Uso:
-#   ./build.sh                 # build onedir em dist/PeptMass/ (+ PeptMass.app no macOS)
-#   ./build.sh --onefile       # build onefile
-#   ./build.sh --no-venv       # usa o Python atual sem criar venv
+#   packaging/build.sh                 # build onedir em dist/PeptMass/ (+ PeptMass.app no macOS)
+#   packaging/build.sh --onefile       # build onefile
+#   packaging/build.sh --no-venv       # usa o Python atual sem criar venv
 #
 set -euo pipefail
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 
 ONEFILE=0
 USE_VENV=1
@@ -33,10 +33,10 @@ fi
 
 echo "==> Instalando dependencias..."
 "$PYTHON" -m pip install --upgrade pip
-"$PYTHON" -m pip install -r requirements.txt -r requirements-build.txt
+"$PYTHON" -m pip install -r requirements/build.txt
 
 echo "==> Rodando a suite cientifica (rede de seguranca)..."
-"$PYTHON" test_suite.py
+"$PYTHON" tests/test_science.py
 
 if [ "$ONEFILE" -eq 1 ]; then
   export PEPTMASS_ONEFILE=1
@@ -45,7 +45,7 @@ else
 fi
 
 echo "==> Empacotando com PyInstaller..."
-"$PYTHON" -m PyInstaller peptmass.spec --noconfirm --clean
+"$PYTHON" -m PyInstaller packaging/peptmass.spec --noconfirm --clean
 
 echo
 echo "==> Pronto. Artefatos em ./dist/"
