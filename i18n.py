@@ -61,9 +61,8 @@ def translate_tree(root):
     if get_language() != "en":
         return
     from PyQt6.QtWidgets import (
-        QLabel, QPushButton, QToolButton, QCheckBox, QRadioButton, QGroupBox,
-        QComboBox, QLineEdit, QPlainTextEdit, QTextEdit, QAbstractButton,
-        QTableWidget, QTabWidget, QWidget)
+        QLabel, QGroupBox, QComboBox, QLineEdit, QPlainTextEdit, QTextEdit,
+        QAbstractButton, QTableWidget, QTabWidget, QWidget)
     from PyQt6.QtGui import QAction
 
     for w in root.findChildren(QWidget):

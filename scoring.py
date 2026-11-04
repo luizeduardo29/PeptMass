@@ -72,16 +72,3 @@ def score_spectrum(matches, exp_mzs, exp_intensities, n_theoretical=None):
                        if n_theoretical else 0.0)
     res["mass_error"] = mass_error_stats(errors)
     return res
-
-
-if __name__ == "__main__":
-    # Teste: casamento perfeito vs. parcial
-    exp = [100.0, 200.0, 300.0, 400.0]
-    inten = [10.0, 40.0, 30.0, 20.0]
-    perfect = morpheus_score(exp, exp, inten)
-    print("perfeito :", f"score={perfect['score']:.4f}  "
-          f"n={perfect['n_matched']}  TIC={perfect['tic_fraction']*100:.0f}%")
-    partial = morpheus_score([200.0, 300.0], exp, inten)
-    print("parcial  :", f"score={partial['score']:.4f}  "
-          f"n={partial['n_matched']}  TIC={partial['tic_fraction']*100:.0f}%")
-    print("erro ppm :", mass_error_stats([2.1, -1.4, 0.8, 3.2, -2.0]))

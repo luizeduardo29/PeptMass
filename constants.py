@@ -11,9 +11,6 @@ Massas médias: pesos atômicos padrão IUPAC.
 # Massa do próton (carga) — valor exigido pela especificação
 PROTON_MASS = 1.007276466812
 
-# Massa do elétron (para cálculos de íons radicais, ETD/ECD)
-ELECTRON_MASS = 0.000548579909
-
 # ---------------------------------------------------------------------------
 # Massas atômicas MONOISOTÓPICAS (isótopo mais abundante)
 # ---------------------------------------------------------------------------
@@ -126,17 +123,4 @@ AMINO_ACIDS = {
     "R": {"name": "Arginine",       "three": "Arg", "formula": "C6H12N4O"},
     "Y": {"name": "Tyrosine",       "three": "Tyr", "formula": "C9H9NO2"},
     "W": {"name": "Tryptophan",     "three": "Trp", "formula": "C11H10N2O"},
-}
-
-# Grupos terminais (massas neutras adicionadas às pontas da cadeia)
-#   N-terminal padrão = H  ; C-terminal padrão = OH  ; soma = H2O
-H2O_FORMULA = "H2O"
-NH3_FORMULA = "NH3"
-CO_FORMULA = "CO"
-
-# Deltas neutros usados na fragmentação (calculados em formula_parser na carga)
-NEUTRAL_LOSS_FORMULAS = {
-    "-NH3": "NH3",
-    "-H2O": "H2O",
-    "-CO": "CO",
 }

@@ -1,8 +1,7 @@
 """Telas: Inicio, Massa, Fragmentacao, Dados experimentais e Biblioteca.
 
 As telas sao HTML do servidor (Jinja) com o comportamento em JavaScript
-(static/*.js) falando com a API (api.py). A Aba 4 do desktop
-(Sequenciamento) continua oculta, como na v1.0.
+(static/*.js) falando com a API (api.py).
 """
 
 from __future__ import annotations

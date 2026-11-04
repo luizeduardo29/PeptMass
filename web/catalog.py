@@ -79,8 +79,3 @@ def make_translator(lang: str | None) -> Callable[..., str]:
         return translate(key, code, **params)
 
     return _
-
-
-def missing_keys(lang: str, reference: str = DEFAULT_LANG) -> set[str]:
-    """Chaves que o idioma de referencia tem e este nao (teste de i18n)."""
-    return set(load_catalog(reference)) - set(load_catalog(lang))

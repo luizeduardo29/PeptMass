@@ -73,13 +73,6 @@ class Database:
             self.conn.commit()
             return cur.lastrowid
 
-    def update_residue(self, rid, name, three, code, formula):
-        with closing(self.conn.cursor()) as cur:
-            cur.execute(
-                "UPDATE custom_residues SET name=?, three=?, code=?, formula=? "
-                "WHERE id=?", (name, three, code, formula, rid))
-            self.conn.commit()
-
     def delete_residue(self, rid):
         with closing(self.conn.cursor()) as cur:
             cur.execute("DELETE FROM custom_residues WHERE id=?", (rid,))
@@ -164,13 +157,3 @@ class Database:
 
     def close(self):
         self.conn.close()
-
-
-if __name__ == "__main__":
-    db = Database("/tmp/_test_peptmass.db")
-    db.add_residue("Aminoisobutyric acid", "Aib", "U", "C4H9NO2")
-    db.add_residue("Norleucine", "Nle", "J", "C6H11NO")
-    print("Resíduos:", db.list_residues())
-    db.close()
-    os.remove("/tmp/_test_peptmass.db")
-    print("DB OK")

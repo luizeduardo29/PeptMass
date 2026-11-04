@@ -24,6 +24,8 @@ import exporters
 import identification
 import pubchem
 import scoring
+import spectra_io
+from constants import PROTON_MASS
 from formula_parser import parse_formula, composition_mass, FormulaError
 from fragmentation import generate_fragments, match_experimental, NEUTRAL_LOSSES
 from mass_calculator import SequenceError
@@ -524,10 +526,6 @@ def ms_open():
     ext = os.path.splitext(filename)[1].lower()
     if ext not in _ALLOWED_MS:
         raise ApiError(g._("ms.bad_ext"))
-    try:
-        import spectra_io
-    except Exception as exc:  # noqa: BLE001 - dependencia opcional
-        raise ApiError(g._("ms.missing_dep", e=exc), 500) from exc
     rid, folder = state.new_upload_dir()
     path = os.path.join(folder, "dados" + ext)
     upload.save(path)
@@ -572,7 +570,6 @@ def _peaks_for(entry: dict, scan):
     cached = entry["peaks"].get(scan.index)
     if cached:
         return cached
-    import spectra_io
     mz, inten = entry["run"].spectrum(scan.index)
     if scan.profile:
         pmz, pint = spectra_io.centroid_peaks(mz, inten)
@@ -662,7 +659,7 @@ def ms_match(rid: str):
     criteria = []
     pz = _int(data.get("prec_charge"), 2, 1, 20)
     if scan.precursor_mz and pz:
-        neutral = scan.precursor_mz * pz - pz * identification.PROTON
+        neutral = scan.precursor_mz * pz - pz * PROTON_MASS
         err = (neutral - r.mono_mass) / r.mono_mass * 1e6
         limit = tol if ppm else 20.0
         criteria.append({"state": "ok" if abs(err) <= limit else "bad",

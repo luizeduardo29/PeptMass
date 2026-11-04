@@ -22,28 +22,25 @@ from matplotlib.backends.backend_qtagg import NavigationToolbar2QT as Navigation
 from matplotlib.figure import Figure
 
 from PyQt6.QtCore import Qt, QTimer, QThread, pyqtSignal
-from PyQt6.QtGui import (QAction, QFont, QGuiApplication, QKeySequence,
-                         QShortcut, QPixmap)
+from PyQt6.QtGui import QAction, QFont, QGuiApplication, QPixmap
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QTabWidget, QVBoxLayout, QHBoxLayout,
     QGridLayout, QFormLayout, QLineEdit, QPlainTextEdit, QPushButton, QLabel,
     QComboBox, QCheckBox, QSpinBox, QDoubleSpinBox, QTableWidget,
     QTableWidgetItem, QHeaderView, QGroupBox, QDialog, QDialogButtonBox,
     QMessageBox, QFileDialog, QSplitter, QListWidget, QListWidgetItem,
-    QAbstractItemView, QToolBar, QStatusBar, QScrollArea, QMenu,
+    QAbstractItemView, QToolBar, QStatusBar,
 )
 
-from constants import AMINO_ACIDS, PROTON_MASS
+from constants import PROTON_MASS
 from database import Database
 from custom_residues import CustomResidueManager
 from modifications import ModificationLibrary, Modification
 from formula_parser import parse_formula, composition_mass, FormulaError
 from mass_calculator import MassCalculator, SequenceError
-from fragmentation import (generate_fragments, match_experimental,
-                           N_TERMINAL_IONS, C_TERMINAL_IONS, NEUTRAL_LOSSES)
+from fragmentation import generate_fragments, match_experimental
 import exporters
 import pubchem
-import denovo
 import scoring
 import identification
 import i18n
@@ -1178,7 +1175,6 @@ class FragmentTab(QWidget):
         if getattr(result, "n_chains", 1) > 1:
             # fragmentação a/b/c/x/y/z pressupõe uma única cadeia linear
             self.fragments = []
-            self.state.last_fragments = []
             self._populate([])
             self._plot_spectrum([])
             return
@@ -1191,7 +1187,6 @@ class FragmentTab(QWidget):
             neutral_losses=self._selected_losses(),
             include_no_loss=self.no_loss.isChecked(),
             n_term_delta=nterm_delta, c_term_delta=cterm_delta)
-        self.state.last_fragments = self.fragments
         self._populate(self.fragments)
         self._plot_spectrum(self.fragments)
 
@@ -1757,7 +1752,7 @@ class ExperimentalTab(QWidget):
         parts = []
         # 1) massa do precursor
         if scan.precursor_mz and pz:
-            neutral = scan.precursor_mz * pz - pz * identification.PROTON
+            neutral = scan.precursor_mz * pz - pz * PROTON_MASS
             err = (neutral - result.mono_mass) / result.mono_mass * 1e6
             ok = abs(err) <= (self.tol.value() if self.ppm.isChecked() else 20.0)
             parts.append(("✓ " if ok else "✗ ") + _(
@@ -1841,166 +1836,6 @@ class ExperimentalTab(QWidget):
 
 
 # ===========================================================================
-# ABA 4 — Sequenciamento (identificação por biblioteca + de novo)
-# ===========================================================================
-class SequencingTab(QWidget):
-    def __init__(self, app_state, exp_tab, parent=None):
-        super().__init__(parent)
-        self.state = app_state
-        self.exp_tab = exp_tab
-        self._build()
-
-    def _build(self):
-        root = QVBoxLayout(self)
-        box = QGroupBox("Espectro MS/MS de entrada")
-        bv = QVBoxLayout(box)
-        row = QHBoxLayout()
-        row.addWidget(QLabel("Precursor m/z:"))
-        self.prec_mz = QDoubleSpinBox()
-        self.prec_mz.setDecimals(4); self.prec_mz.setRange(0, 100000)
-        row.addWidget(self.prec_mz)
-        row.addWidget(QLabel("Carga:"))
-        self.prec_z = QSpinBox(); self.prec_z.setRange(1, 10); self.prec_z.setValue(2)
-        row.addWidget(self.prec_z)
-        row.addWidget(QLabel("Tol.:"))
-        self.tol = QDoubleSpinBox()
-        self.tol.setDecimals(4); self.tol.setRange(0.0001, 1000); self.tol.setValue(10.0)
-        row.addWidget(self.tol)
-        self.ppm = QCheckBox("ppm"); self.ppm.setChecked(True); row.addWidget(self.ppm)
-        pull = QPushButton("Pegar espectro da Aba 3")
-        pull.clicked.connect(self._pull_from_exp); row.addWidget(pull)
-        row.addStretch()
-        bv.addLayout(row)
-        self.peaks_text = QPlainTextEdit()
-        self.peaks_text.setPlaceholderText(
-            "Cole os picos: um m/z por linha (intensidade opcional após espaço/vírgula)")
-        self.peaks_text.setFixedHeight(80)
-        bv.addWidget(self.peaks_text)
-        self.info = QLabel("—")
-        bv.addWidget(self.info)
-        root.addWidget(box)
-
-        arow = QHBoxLayout()
-        idb = QPushButton("Identificar por biblioteca")
-        idb.setObjectName("accent"); idb.clicked.connect(self._identify)
-        dnb = QPushButton("Sequenciar de novo")
-        dnb.setObjectName("accent"); dnb.clicked.connect(self._denovo)
-        arow.addWidget(idb); arow.addWidget(dnb); arow.addStretch()
-        root.addLayout(arow)
-
-        split = QSplitter(Qt.Orientation.Vertical)
-        libbox = QGroupBox("Identificação por biblioteca (ranqueado)")
-        lv = QVBoxLayout(libbox)
-        self.lib_table = make_table(
-            ["#", "Peptídeo", "Erro precursor", "Íons b/y", "Cobertura", "Score"])
-        self.lib_table.customContextMenuRequested.connect(
-            lambda p: copy_table_selection(self.lib_table))
-        lv.addWidget(self.lib_table)
-        split.addWidget(libbox)
-
-        dnbox = QGroupBox("De novo (grafo de espectro)")
-        dv = QVBoxLayout(dnbox)
-        self.dn_result = QLabel("—")
-        self.dn_result.setObjectName("result"); self.dn_result.setWordWrap(True)
-        self.dn_note = QLabel(""); self.dn_note.setWordWrap(True)
-        self.dn_note.setStyleSheet("color:#e0a96c;")
-        dv.addWidget(self.dn_result); dv.addWidget(self.dn_note); dv.addStretch()
-        split.addWidget(dnbox)
-        split.setSizes([360, 150])
-        root.addWidget(split, stretch=1)
-
-    def _parse_peaks(self):
-        mz, inten = [], []
-        for line in self.peaks_text.toPlainText().replace(",", " ").splitlines():
-            parts = line.split()
-            if not parts:
-                continue
-            try:
-                m = float(parts[0])
-            except ValueError:
-                continue
-            i = 1.0
-            if len(parts) > 1:
-                try:
-                    i = float(parts[1])
-                except ValueError:
-                    i = 1.0
-            mz.append(m); inten.append(i)
-        return mz, inten
-
-    def _pull_from_exp(self):
-        et = self.exp_tab
-        if not getattr(et, "peak_mz", None):
-            QMessageBox.information(
-                self, "Aviso", "Escolha um scan na Aba 3 primeiro.")
-            return
-        self.peaks_text.setPlainText(
-            "\n".join(f"{m:.4f} {i:.0f}" for m, i in zip(et.peak_mz, et.peak_int)))
-        if et.current_scan and et.current_scan.precursor_mz:
-            self.prec_mz.setValue(et.current_scan.precursor_mz)
-        self.info.setText(f"{len(et.peak_mz)} picos importados da Aba 3.")
-
-    def _get_input(self):
-        mz, inten = self._parse_peaks()
-        if not mz:
-            QMessageBox.information(
-                self, "Aviso", "Forneça os picos (cole ou pegue da Aba 3).")
-            return None
-        if self.prec_mz.value() <= 0:
-            QMessageBox.information(
-                self, "Aviso", "Informe o m/z do precursor.")
-            return None
-        return mz, inten
-
-    def _identify(self):
-        got = self._get_input()
-        if not got:
-            return
-        mz, inten = got
-        peps = self.state.db.list_peptides()
-        rank = denovo.library_identify(
-            self.state.calc, peps, mz, self.prec_mz.value(),
-            self.prec_z.value(), tol=self.tol.value(), ppm=self.ppm.isChecked())
-        self.lib_table.setSortingEnabled(False)
-        self.lib_table.setRowCount(0)
-        for i, x in enumerate(rank[:25], 1):
-            row = self.lib_table.rowCount()
-            self.lib_table.insertRow(row)
-            self.lib_table.setItem(row, 0, NumericItem(i, str(i)))
-            self.lib_table.setItem(row, 1, QTableWidgetItem(x["name"]))
-            self.lib_table.setItem(row, 2, NumericItem(
-                abs(x["prec_err_ppm"]), f"{x['prec_err_ppm']:+.1f} ppm"))
-            self.lib_table.setItem(row, 3, NumericItem(
-                x["matched"], f"{x['matched']}/{x['total_by']}"))
-            self.lib_table.setItem(row, 4, NumericItem(
-                x["coverage"], f"{x['coverage']:.0f}%"))
-            self.lib_table.setItem(row, 5, NumericItem(
-                x["score"], str(int(x["score"]))))
-        self.lib_table.setSortingEnabled(True)
-        if rank and rank[0]["score"] >= 1000:
-            self.info.setText(f"Melhor candidato: {rank[0]['name']}  "
-                              f"({rank[0]['matched']}/{rank[0]['total_by']} íons b/y).")
-
-    def _denovo(self):
-        got = self._get_input()
-        if not got:
-            return
-        mz, inten = got
-        da_tol = 0.02 if self.ppm.isChecked() else self.tol.value()
-        res = denovo.denovo_sequence(
-            mz, self.prec_mz.value(), self.prec_z.value(),
-            peak_int=inten, tol=da_tol)
-        seq = res["sequence"] or "(nenhum caminho encontrado)"
-        self.dn_result.setText(f"Sequência (N→C):  {seq}")
-        status = ("completa" if res["complete"]
-                  else f"parcial — {res['coverage'] * 100:.0f}% da massa explicada")
-        self.dn_note.setText(
-            f"Cobertura {status}.  I/L são indistinguíveis por massa (rótulo "
-            f"'I/L'); K/Q diferem só 0.036 Da. Use a identificação por "
-            f"biblioteca para confirmar.")
-
-
-# ===========================================================================
 # Estado compartilhado da aplicação
 # ===========================================================================
 # Bibliotecas de peptideos-exemplo (GLP e antidopagem): ficam em presets.py,
@@ -2017,7 +1852,6 @@ class AppState:
         self.mod_library = ModificationLibrary(custom=custom_mods)
         self.calc = MassCalculator(self.custom_manager, self.mod_library)
         self.last_mass_result = None
-        self.last_fragments = []
         self.on_mass_updated = None
         self._seed_presets()
 
@@ -2088,8 +1922,6 @@ class MainWindow(QMainWindow):
         tabs.addTab(self.mass_tab, _("  Massa Molecular  "))
         tabs.addTab(self.frag_tab, _("  Fragmentação MS/MS  "))
         tabs.addTab(self.exp_tab, _("  Dados experimentais  "))
-        # Aba de Sequenciamento oculta na v1.0 (SequencingTab/denovo.py prontos
-        # no código para reativar em versão futura).
         self.setCentralWidget(tabs)
 
         tb = QToolBar()
@@ -2196,7 +2028,3 @@ def main():
     win = MainWindow()
     win.show()
     sys.exit(app.exec())
-
-
-if __name__ == "__main__":
-    main()

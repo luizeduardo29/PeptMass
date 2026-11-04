@@ -153,15 +153,3 @@ class CustomResidueManager:
 
     def codes(self):
         return set(self._residues.keys())
-
-
-if __name__ == "__main__":
-    mgr = CustomResidueManager()
-    aib = mgr.add("Aminoisobutyric acid", "Aib", "U", "C4H9NO2")
-    print(f"Aib  resíduo={aib.residue_formula}  "
-          f"mono={aib.mono_mass:.6f}  livre={aib.free_mono_mass:.6f}")
-    nle = mgr.add("Norleucine", "Nle", "J", "C6H13NO2")
-    print(f"Nle  resíduo={nle.residue_formula}  mono={nle.mono_mass:.6f}")
-    # Aib resíduo C4H7NO esperado 85.052764
-    assert abs(aib.mono_mass - 85.052764) < 1e-4, aib.mono_mass
-    print("OK")

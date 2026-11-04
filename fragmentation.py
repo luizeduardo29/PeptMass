@@ -44,7 +44,6 @@ ION_OFFSETS = {
 }
 
 N_TERMINAL_IONS = ("a", "b", "c")
-C_TERMINAL_IONS = ("x", "y", "z", "z+1")
 
 NEUTRAL_LOSSES = {
     "-NH3": _NH3,
@@ -178,24 +177,3 @@ def match_experimental(fragments, exp_mz_list, tolerance=0.02, ppm=False):
         if best is not None:
             matches.append((exp, best, best_err))
     return matches
-
-
-if __name__ == "__main__":
-    from mass_calculator import MassCalculator
-    calc = MassCalculator()
-    pep = calc.parse("PEPTIDE")
-    frags = generate_fragments(pep, ion_types=["b", "y"], charges=[1])
-    # valores publicados de referência
-    ref = {"b2": 227.10263, "y2": 263.08737, "b6": 653.31407, "y6": 703.31446}
-    got = {f.label: f.mz for f in frags if not f.neutral_loss}
-    for label, exp in ref.items():
-        v = got.get(label)
-        flag = "OK" if v and abs(v - exp) < 1e-3 else "ERRO"
-        print(f"{flag}  {label:5s} {v:.5f}  (ref {exp})")
-
-    print("\nCom perdas neutras e carga 2+ (b5):")
-    frags2 = generate_fragments(pep, ["b"], [1, 2],
-                                neutral_losses=["-H2O", "-NH3"])
-    for f in frags2:
-        if f.number == 5:
-            print(f"  {f.label:8s} z={f.charge}  m/z={f.mz:.5f}")

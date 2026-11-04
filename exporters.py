@@ -6,7 +6,6 @@ além de importação FASTA e exportação compatível com Skyline.
 """
 
 import csv
-import io
 
 
 # ---------------------------------------------------------------------------
@@ -141,13 +140,3 @@ def to_skyline_transition_list(path, peptide_sequence, fragments,
             "light",
         ])
     to_csv(path, headers, rows)
-
-
-if __name__ == "__main__":
-    entries = parse_fasta(">sp|TEST|Example\nPEPTIDE\nACDEF\n>second\nGGGG")
-    print("FASTA:", entries)
-    to_csv("/tmp/_t.csv", ["a", "b"], [[1, 2], [3, 4]])
-    to_txt("/tmp/_t.txt", ["Ion", "m/z"], [["b2", 227.1026]], title="Teste")
-    to_xlsx("/tmp/_t.xlsx", ["Ion", "m/z"], [["b2", 227.1026]])
-    to_pdf("/tmp/_t.pdf", ["Ion", "m/z"], [["b2", 227.1026]], title="Teste")
-    print("Exportadores OK (csv/txt/xlsx/pdf gerados em /tmp)")

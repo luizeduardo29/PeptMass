@@ -162,7 +162,6 @@
   "ms.file.opened": "{f} · {n} scans",
   "ms.no_file": "Escolha um arquivo .mzML, .mzXML ou .raw.",
   "ms.bad_ext": "Formato não suportado. Use .mzML, .mzXML ou .raw.",
-  "ms.missing_dep": "A leitura de espectros requer pyteomics/psims/lxml: {e}",
   "ms.open_error": "Erro ao abrir: {e}",
   "ms.run_gone": "O arquivo não está mais aberto no servidor. Abra-o de novo.",
   "ms.level": "Nível MS",

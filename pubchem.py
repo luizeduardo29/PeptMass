@@ -40,8 +40,6 @@ class PubChemCompound:
     clean_formula: str        # fórmula sanitizada (sem cargas/sais)
     iupac_name: str
     pubchem_monoisotopic: float
-    pubchem_exact: float
-    pubchem_avg: float
     composition: dict         # composição elementar (do clean_formula)
 
     @property
@@ -129,8 +127,6 @@ def _build_compound(query, props):
         clean_formula=clean,
         iupac_name=props.get("IUPACName", ""),
         pubchem_monoisotopic=_to_float(props.get("MonoisotopicMass")),
-        pubchem_exact=_to_float(props.get("ExactMass")),
-        pubchem_avg=_to_float(props.get("MolecularWeight")),
         composition=comp,
     )
 
@@ -177,32 +173,3 @@ def fetch_structure_png(cid: int) -> bytes:
 
 
 # ---------------------------------------------------------------------------
-if __name__ == "__main__":
-    # Teste OFFLINE do sanitizador e do parsing (não acessa a rede).
-    print("Teste de sanitização de fórmula:")
-    for raw, exp in [("C9H8O4", "C9H8O4"),
-                     ("C5H12N2O2", "C5H12N2O2"),     # ornitina
-                     ("C6H13N2O2+", "C6H13N2O2"),     # cátion (lisina+)
-                     ("C2H3O2.Na", "C2H3NaO2"),       # acetato de sódio
-                     ("Mg+2", "Mg")]:
-        clean, comp = clean_formula(raw)
-        flag = "OK" if clean == exp else "??"
-        print(f"  [{flag}] {raw:14s} -> {clean:12s} "
-              f"mono={composition_mass(comp):.5f}")
-
-    # Teste de parsing de resposta simulada do PubChem (estrutura real)
-    mock = {
-        "PropertyTable": {"Properties": [{
-            "CID": 6262,
-            "MolecularFormula": "C5H12N2O2",
-            "MonoisotopicMass": "132.08988",
-            "ExactMass": "132.08988",
-            "MolecularWeight": "132.16",
-            "IUPACName": "(2S)-2,5-diaminopentanoic acid",
-        }]}}
-    c = _build_compound("ornithine", mock["PropertyTable"]["Properties"][0])
-    print(f"\nMock 'ornithine': CID={c.cid} {c.clean_formula} "
-          f"PubChem mono={c.pubchem_monoisotopic} "
-          f"PeptMass mono={c.free_mono_mass:.5f}")
-    assert abs(c.free_mono_mass - 132.089878) < 1e-3
-    print("Parsing PubChem: OK")

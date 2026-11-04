@@ -436,7 +436,6 @@ button:disabled { opacity: .5; cursor: not-allowed; }
 .danger:hover:not(:disabled) { background: var(--vermelho-suave); border-color: var(--vermelho); color: var(--vermelho); }
 
 .pequeno { padding: 6px 11px; font-size: 12.5px; gap: 5px; }
-.largura-total { width: 100%; }
 .btn-bloco { display: flex; justify-content: center; width: 100%; }
 
 /* ----------------------------------------------------------------- tabelas */

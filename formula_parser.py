@@ -120,20 +120,3 @@ def composition_to_string(composition: dict) -> str:
             continue
         parts.append(el if c == 1 else f"{el}{c}")
     return "".join(parts)
-
-
-if __name__ == "__main__":
-    # auto-teste rápido
-    tests = {
-        "C4H9NO2": 103.063329,        # Aib (massa molecular livre)
-        "H2O": 18.0105646,
-        "NH3": 17.0265491,
-        "CO": 27.9949146,
-        "C6H12O6": 180.063388,
-    }
-    for f, expected in tests.items():
-        m = formula_mass(f)
-        flag = "OK" if abs(m - expected) < 1e-4 else "ERRO"
-        print(f"{flag}  {f:12s} mono={m:.6f}  esperado~{expected}")
-    print("Composição C4H9NO2 ->", parse_formula("C4H9NO2"))
-    print("String ->", composition_to_string(parse_formula("C4H9NO2")))

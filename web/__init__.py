@@ -69,7 +69,6 @@ def create_app() -> Flask:
     app = Flask(__name__, static_folder="static", template_folder="templates")
     max_mb = int(os.environ.get("PEPTMASS_MAX_UPLOAD_MB", "4096"))
     app.config["MAX_CONTENT_LENGTH"] = max_mb * 1024 * 1024
-    app.config["JSON_SORT_KEYS"] = False
     csrf = hmac.new(_secret(), b"peptmass-csrf", hashlib.sha256).hexdigest()
     state.clear_stale_uploads()
 

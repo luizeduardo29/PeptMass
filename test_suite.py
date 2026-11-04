@@ -12,7 +12,6 @@ from mass_calculator import MassCalculator
 from fragmentation import generate_fragments
 from custom_residues import CustomResidueManager
 from database import Database
-import tempfile, os
 
 PASS, FAIL = 0, 0
 
@@ -70,7 +69,7 @@ def main():
     check("z2", g["z2"], 246.06082)
 
     print("\n• Aminoácido personalizado (Aib = C4H9NO2):")
-    db = Database(tempfile.mktemp(suffix=".db"))
+    db = Database(":memory:")
     mgr = CustomResidueManager(db)
     mgr.add("Aminoisobutyric acid", "Aib", "U", "C4H9NO2")
     calc2 = MassCalculator(mgr)

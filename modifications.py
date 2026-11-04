@@ -9,7 +9,7 @@ onde a modificação pode ser aplicada: 'N-term', 'C-term' ou um conjunto de
 resíduos.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Optional
 
 from formula_parser import parse_formula, composition_mass, composition_to_string
@@ -26,10 +26,6 @@ class Modification:
     @property
     def mono_delta(self) -> float:
         return composition_mass(self.composition, average=False)
-
-    @property
-    def avg_delta(self) -> float:
-        return composition_mass(self.composition, average=True)
 
     @property
     def formula_str(self) -> str:
@@ -176,18 +172,3 @@ class ModificationLibrary:
     def for_residue(self, residue: str):
         return [m for m in self._mods.values()
                 if m.position == "residue" and residue in m.targets]
-
-
-if __name__ == "__main__":
-    lib = ModificationLibrary()
-    checks = {
-        "Acetyl": 42.010565, "Amidation": -0.984016,
-        "Phosphorylation": 79.966331, "Carbamidomethyl": 57.021464,
-        "Deamidation": 0.984016, "Sulfation": 79.956815,
-        "Oxidation": 15.994915,
-    }
-    for name, exp in checks.items():
-        m = lib.get(name)
-        flag = "OK" if abs(m.mono_delta - exp) < 1e-5 else "ERRO"
-        print(f"{flag}  {name:18s} {m.mono_delta:+.6f} (esperado {exp:+.6f})"
-              f"  [{m.formula_str}]")

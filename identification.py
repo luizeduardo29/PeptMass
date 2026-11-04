@@ -14,7 +14,8 @@ Estas métricas apoiam os critérios de identificação (massa do precursor, tem
 de retenção e íons diagnósticos são avaliados na interface).
 """
 
-PROTON = 1.007276466812
+from constants import PROTON_MASS
+
 ISOTOPE_SPACING = 1.0033548   # Δm C13-C12 (espaçamento isotópico médio)
 
 
@@ -77,7 +78,7 @@ def isotope_fit(exp_mz, exp_int, theo_dist, charge, tol=0.02):
     th = sorted(theo_dist, key=lambda x: x[0])
     exp_vec, theo_vec, n = [], [], 0
     for neutral, rel in th:
-        mz = (neutral + charge * PROTON) / charge
+        mz = (neutral + charge * PROTON_MASS) / charge
         j = _nearest(exp_mz, mz)
         if j >= 0 and abs(exp_mz[j] - mz) <= tol:
             exp_vec.append(float(exp_int[j])); n += 1
@@ -85,21 +86,3 @@ def isotope_fit(exp_mz, exp_int, theo_dist, charge, tol=0.02):
             exp_vec.append(0.0)
         theo_vec.append(float(rel))
     return cosine(exp_vec, theo_vec), n
-
-
-if __name__ == "__main__":
-    # cluster sintético: PEPTIDE (C34H53N7O15) 2+, isótopos a cada 0.5017
-    import numpy as np
-    from mass_calculator import MassCalculator
-    calc = MassCalculator(); r = calc.parse("PEPTIDE")
-    dist = calc.isotopic_distribution(r.composition, max_peaks=6)
-    z = 2
-    mzs = [(m + z * PROTON) / z for m, _ in dist]
-    ints = [i for _, i in dist]
-    # adiciona ruido/pico alheio
-    mz_all = mzs + [350.0, 999.0]
-    int_all = ints + [5.0, 3.0]
-    ez, nz = estimate_charge(np.array(mz_all), np.array(int_all), mzs[0])
-    fit, nf = isotope_fit(np.array(mz_all), np.array(int_all), dist, z)
-    print(f"carga estimada: {ez} (isotopos={nz}) | esperado 2")
-    print(f"ajuste isotopico (cosseno): {fit:.4f} | isotopos alinhados {nf}")

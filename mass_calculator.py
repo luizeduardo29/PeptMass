@@ -31,7 +31,6 @@ class ResidueInfo:
     name: str
     three: str
     composition: dict          # composição do resíduo (sem água)
-    is_custom: bool = False
 
 
 def build_residue_table(custom_manager=None):
@@ -39,16 +38,16 @@ def build_residue_table(custom_manager=None):
     table = {}
     for code, info in AMINO_ACIDS.items():
         table[code] = ResidueInfo(code, info["name"], info["three"],
-                                  parse_formula(info["formula"]), False)
+                                  parse_formula(info["formula"]))
     # resíduos não-naturais embutidos (sempre disponíveis, como os naturais)
     for name, three, code, free_formula in BUILTIN_RESIDUES:
         res = CustomResidue(name, three, code, free_formula, builtin=True)
         table[code] = ResidueInfo(code, name, three,
-                                  res.residue_composition, True)
+                                  res.residue_composition)
     if custom_manager:
         for r in custom_manager.all():
             table[r.code] = ResidueInfo(r.code, r.name, r.three,
-                                        r.residue_composition, True)
+                                        r.residue_composition)
     return table
 
 
@@ -98,12 +97,6 @@ def _code_from_match(m):
     colchetes é usado literalmente (preserva caixa, ex.: 'Aib')."""
     multi = m.group("multi")
     return multi if multi is not None else m.group("single").upper()
-
-
-def format_residue_codes(codes):
-    """Junta uma lista de códigos numa string de sequência, recolocando os
-    colchetes nos códigos multi-caractere. Ex.: ['A','Orn','G'] -> 'A[Orn]G'."""
-    return "".join(c if len(c) == 1 else f"[{c}]" for c in codes)
 
 
 class MassCalculator:
@@ -290,7 +283,6 @@ class MassCalculator:
             # agrupar por massa nominal (inteiro) para limitar explosão
             for m1, p1 in d:
                 for m2, p2 in isotopes:
-                    nominal = round(m1 + m2, 4)
                     key = round((m1 + m2))   # bucket por unidade de massa
                     prob = p1 * p2
                     if prob < prune:
@@ -319,15 +311,9 @@ class MassCalculator:
                 if el in ELEMENTS_MONO and count > 0:
                     dist = convolve(dist, [(ELEMENTS_MONO[el] * count, 1.0)])
                 continue
-            iso = ISOTOPES[el]
             # exponenciação por quadrados para n átomos
-            n = count
-            base = iso
-            acc = None
-            elem_dist = [(0.0, 1.0)]
-            # convolução repetida (rápida via squaring)
-            power = base
-            remaining = n
+            power = ISOTOPES[el]
+            remaining = count
             elem = [(0.0, 1.0)]
             while remaining:
                 if remaining & 1:
@@ -344,31 +330,3 @@ class MassCalculator:
         result = [(m, 100.0 * p / mx) for m, p in dist if p / mx >= prune]
         result.sort(key=lambda x: x[0])
         return result[:max_peaks]
-
-
-if __name__ == "__main__":
-    calc = MassCalculator()
-    # PEPTIDE
-    r = calc.parse("PEPTIDE")
-    print(f"PEPTIDE  mono={r.mono_mass:.6f}  avg={r.avg_mass:.6f}  "
-          f"formula={r.formula}")
-    # esperado mono 799.359964, avg 799.8246
-    assert abs(r.mono_mass - 799.359964) < 1e-3, r.mono_mass
-    print("[M+H]+ =", f"{calc.mz(r.mono_mass,1):.6f}",
-          " [M+2H]2+ =", f"{calc.mz(r.mono_mass,2):.6f}")
-
-    # com modificações
-    r2 = calc.parse("PEPTIDE", n_term_mod="Acetyl", c_term_mod="Amidation")
-    print(f"Ac-PEPTIDE-NH2  mono={r2.mono_mass:.6f}  "
-          f"(delta={r2.mono_mass-r.mono_mass:+.6f})")
-
-    # fosfo inline
-    r3 = calc.parse("PEPT(Phosphorylation)IDE")
-    print(f"PEPT(Phospho)IDE mono={r3.mono_mass:.6f} "
-          f"(delta={r3.mono_mass-r.mono_mass:+.6f})")
-
-    # distribuição isotópica
-    print("\nEnvelope isotópico (PEPTIDE):")
-    for m, i in calc.isotopic_distribution(r.composition, max_peaks=6):
-        bar = "#" * int(i / 3)
-        print(f"  {m:10.5f}  {i:6.2f}  {bar}")
