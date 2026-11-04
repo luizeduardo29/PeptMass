@@ -89,9 +89,9 @@
 </section>
 {% endblock %}
 
-{% block dialogs %}{% include "_dialogs.html" %}{% endblock %}
+{% block dialogs %}{% include "partials/_dialogs.html" %}{% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='peptmass.js') }}"></script>
-<script src="{{ url_for('static', filename='library.js') }}"></script>
+<script src="{{ url_for('static', filename='js/peptmass.js') }}"></script>
+<script src="{{ url_for('static', filename='js/library.js') }}"></script>
 {% endblock %}

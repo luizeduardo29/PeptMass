@@ -7,7 +7,7 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>{{ _('app.title') }}</title>
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo-mini-64.png') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
   {% block head %}{% endblock %}
 </head>
 <body>
@@ -34,9 +34,9 @@
 
 <header class="topbar">
   <a class="brand" href="{{ url_for('pages.home') }}">
-    {% include "_logo.html" %}
+    {% include "partials/_logo.html" %}
     <span class="brand-textos">
-      <strong class="brand-nome">{% include "_brand.html" %}</strong>
+      <strong class="brand-nome">{% include "partials/_brand.html" %}</strong>
       <small class="brand-sub">{{ _('app.tagline') }}</small>
     </span>
   </a>
@@ -49,7 +49,7 @@
     <a href="{{ url_for('pages.library') }}" class="{{ 'on' if nav_on == 'library' }}" title="{{ _('nav.library') }}"><svg class="icone" aria-hidden="true"><use href="#i-biblioteca"/></svg><span>{{ _('nav.library') }}</span></a>
   </nav>
   <div class="topo-controles">
-    {% include "_prefs.html" %}
+    {% include "partials/_prefs.html" %}
   </div>
 </header>
 
@@ -65,7 +65,7 @@
 {% block dialogs %}{% endblock %}
 <script id="i18n-catalog" type="application/json">{{ i18n_catalog | tojson }}</script>
 <script>window.PEPTMASS = {{ {'proton': proton_mass, 'lang': lang} | tojson }};</script>
-<script src="{{ url_for('static', filename='app.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
 {% block scripts %}{% endblock %}
 </body>
 </html>

@@ -1,7 +1,7 @@
 """Telas: Inicio, Massa, Fragmentacao, Dados experimentais e Biblioteca.
 
 As telas sao HTML do servidor (Jinja) com o comportamento em JavaScript
-(static/*.js) falando com a API (api.py).
+(static/js) falando com a API (blueprints/api).
 """
 
 from __future__ import annotations
@@ -12,8 +12,7 @@ from flask import Blueprint, render_template
 
 from peptmass.core.formula_parser import FormulaError
 from peptmass.core.mass_calculator import SequenceError
-
-from .state import LOCK, get_state
+from peptmass.web.state import LOCK, get_state
 
 bp = Blueprint("pages", __name__)
 

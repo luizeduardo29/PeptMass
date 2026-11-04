@@ -10,13 +10,21 @@ Ferramentas de confirmação de identidade a partir do MS1 do precursor:
   com o teórico (de `MassCalculator.isotopic_distribution`) e devolve um escore
   de ajuste 0–1.
 
-Estas métricas apoiam os critérios de identificação (massa do precursor, tempo
-de retenção e íons diagnósticos são avaliados na interface).
+- `evaluate_criteria()` — avalia massa do precursor, tempo de retenção, íons
+  diagnósticos e envelope isotópico, para a web e o desktop.
 """
 
 from peptmass.core.constants import PROTON_MASS
 
 ISOTOPE_SPACING = 1.0033548   # Δm C13-C12 (espaçamento isotópico médio)
+
+# Limites dos critérios "estilo WADA". São decisões deste sistema, não regras
+# oficiais: qualquer mudança aqui vale para a web e para o desktop.
+PRECURSOR_LIMIT_PPM = 20.0    # usado quando a tolerância do matching é em Da
+MIN_DIAGNOSTIC_IONS = 2
+MIN_ISOTOPE_COSINE = 0.9
+MIN_ALIGNED_ISOTOPES = 2
+MIN_ISOTOPE_TOLERANCE = 0.02  # Da
 
 
 def _nearest(mz_list, target):
@@ -86,3 +94,44 @@ def isotope_fit(exp_mz, exp_int, theo_dist, charge, tol=0.02):
             exp_vec.append(0.0)
         theo_vec.append(float(rel))
     return cosine(exp_vec, theo_vec), n
+
+
+def ms1_envelope_fit(run, scan, distribution, charge, tol):
+    """(cosseno, n isotopos) contra o MS1 anterior ao scan, ou None. O ajuste e'
+    complementar: uma falha de leitura nao pode derrubar a anotacao do espectro."""
+    try:
+        ms1 = run.ms1_before(scan)
+        if ms1 is None:
+            return None
+        mz, intensity = run.spectrum(ms1.index)
+        return isotope_fit(mz, intensity, distribution, charge,
+                           tol=max(tol, MIN_ISOTOPE_TOLERANCE))
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def evaluate_criteria(mono_mass, precursor_mz, charge, tolerance, ppm, scan_rt,
+                      expected_rt, rt_window, n_ions, envelope_fit):
+    """Criterios de identificacao, na ordem de exibicao.
+
+    Devolve [{"kind", "state", "value"}]: kind e' precursor | rt | ions | isotopes
+    e state e' ok | bad | warn. Precursor e RT so entram quando ha dado para
+    avaliar; expected_rt = 0 significa "nao informado"."""
+    criteria = []
+    if precursor_mz and charge:
+        neutral = precursor_mz * charge - charge * PROTON_MASS
+        error = (neutral - mono_mass) / mono_mass * 1e6
+        limit = tolerance if ppm else PRECURSOR_LIMIT_PPM
+        criteria.append({"kind": "precursor", "value": error,
+                         "state": "ok" if abs(error) <= limit else "bad"})
+    if expected_rt > 0:
+        delta = abs(scan_rt - expected_rt)
+        criteria.append({"kind": "rt", "value": delta,
+                         "state": "ok" if delta <= rt_window else "bad"})
+    criteria.append({"kind": "ions", "value": n_ions,
+                     "state": "ok" if n_ions >= MIN_DIAGNOSTIC_IONS else "bad"})
+    if envelope_fit and envelope_fit[1] >= MIN_ALIGNED_ISOTOPES:
+        fit = envelope_fit[0]
+        criteria.append({"kind": "isotopes", "value": fit,
+                         "state": "ok" if fit >= MIN_ISOTOPE_COSINE else "warn"})
+    return criteria

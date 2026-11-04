@@ -442,35 +442,23 @@ class ExperimentalTab(QWidget):
         pz = self.prec_charge.value()
         parts = []
         # 1) massa do precursor
-        if scan.precursor_mz and pz:
-            neutral = scan.precursor_mz * pz - pz * PROTON_MASS
-            err = (neutral - result.mono_mass) / result.mono_mass * 1e6
-            ok = abs(err) <= (self.tol.value() if self.ppm.isChecked() else 20.0)
-            parts.append(("✓ " if ok else "✗ ") + _(
-                "precursor {e} ppm (z={z})").format(e=f"{err:+.1f}", z=pz))
-        # 2) tempo de retenção
-        if self.rt_exp.value() > 0:
-            drt = abs(scan.rt - self.rt_exp.value())
-            ok = drt <= self.rt_win.value()
-            parts.append(("✓ " if ok else "✗ ") + _(
-                "RT Δ{d} min").format(d=f"{drt:.2f}"))
-        # 3) íons diagnósticos
-        parts.append(("✓ " if n_ions >= 2 else "✗ ") + _(
-            "{n} íons diagnósticos").format(n=n_ions))
-        # 4) ajuste do envelope isotópico (do MS1 anterior)
-        try:
-            ms1 = self.run.ms1_before(scan) if self.run else None
-            if ms1 is not None:
-                mz1, i1 = self.run.spectrum(ms1.index)
-                dist = self.state.calc.isotopic_distribution(
-                    result.composition, max_peaks=8)
-                fit, nfit = identification.isotope_fit(
-                    mz1, i1, dist, pz, tol=max(self.xic_tol.value(), 0.02))
-                if nfit >= 2:
-                    parts.append(("✓ " if fit >= 0.9 else "~ ") + _(
-                        "isótopos {f}").format(f=f"{fit:.2f}"))
-        except Exception:
-            pass
+        distribution = self.state.calc.isotopic_distribution(
+            result.composition, max_peaks=8)
+        envelope = identification.ms1_envelope_fit(
+            self.run, scan, distribution, pz, self.xic_tol.value())
+        criteria = identification.evaluate_criteria(
+            result.mono_mass, scan.precursor_mz, pz, self.tol.value(),
+            self.ppm.isChecked(), scan.rt, self.rt_exp.value(),
+            self.rt_win.value(), n_ions, envelope)
+        marks = {"ok": "✓ ", "bad": "✗ ", "warn": "~ "}
+        texts = {
+            "precursor": lambda v: _("precursor {e} ppm (z={z})").format(
+                e=f"{v:+.1f}", z=pz),
+            "rt": lambda v: _("RT Δ{d} min").format(d=f"{v:.2f}"),
+            "ions": lambda v: _("{n} íons diagnósticos").format(n=v),
+            "isotopes": lambda v: _("isótopos {f}").format(f=f"{v:.2f}"),
+        }
+        parts = [marks[c["state"]] + texts[c["kind"]](c["value"]) for c in criteria]
         self.crit_label.setText(_("Critérios:") + "   " + "    ".join(parts))
 
     # íons N-terminais (a/b/c) vs C-terminais (x/y/z) para colorir a marcação

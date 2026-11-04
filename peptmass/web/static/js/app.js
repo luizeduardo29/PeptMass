@@ -202,6 +202,5 @@
     node.textContent = text || "";
   }
 
-  window.PMBase = { T: T, api: api, el: el, num: num, setState: setState,
-                    copyText: copyText, csrf: CSRF, catalog: CATALOG };
+  window.PMBase = { T: T, api: api, el: el, num: num, setState: setState, csrf: CSRF };
 })();
