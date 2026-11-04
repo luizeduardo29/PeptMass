@@ -15,8 +15,8 @@ Retorna composição elementar (dict) e massas monoisotópica e média.
 import re
 from collections import defaultdict
 
-from constants import ELEMENTS_MONO, ELEMENTS_AVG
-from i18n import t as _
+from peptmass.core.constants import ELEMENTS_MONO, ELEMENTS_AVG
+from peptmass.core.i18n import t as _
 
 _TOKEN_RE = re.compile(r"([A-Z][a-z]?|\(|\))(-?\d*)")
 

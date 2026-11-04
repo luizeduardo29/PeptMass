@@ -27,6 +27,10 @@ from collections import Counter
 from dataclasses import dataclass
 
 
+# peptmass/infra/spectra_io.py -> raiz do projeto
+_PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
 class SpectraIOError(Exception):
     pass
 
@@ -268,8 +272,8 @@ class MzxmlRun(_PyteomicsRun):
 def find_thermo_parser():
     """Localiza o ThermoRawFileParser. Ordem de busca:
     1) variável de ambiente PEPTMASS_THERMO_PARSER (caminho do exe);
-    2) pasta 'ThermoRawFileParser' no bundle (exe PyInstaller) ou ao lado
-       deste módulo (execução por código);
+    2) pasta 'ThermoRawFileParser' no bundle (exe PyInstaller) ou na raiz
+       do projeto (execução por código);
     3) no PATH (ThermoRawFileParser.exe / ThermoRawFileParser)."""
     env = os.environ.get("PEPTMASS_THERMO_PARSER")
     if env and os.path.exists(env):
@@ -278,7 +282,7 @@ def find_thermo_parser():
     # exe congelado (PyInstaller): dados ficam em sys._MEIPASS
     if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
         bases.append(sys._MEIPASS)
-    bases.append(os.path.dirname(os.path.abspath(__file__)))
+    bases.append(_PROJECT_ROOT)
     for base in bases:
         for name in ("ThermoRawFileParser.exe", "ThermoRawFileParser"):
             cand = os.path.join(base, "ThermoRawFileParser", name)

@@ -20,15 +20,15 @@ import tempfile
 
 from flask import Blueprint, g, jsonify, request, send_file
 
-import exporters
-import identification
-import pubchem
-import scoring
-import spectra_io
-from constants import PROTON_MASS
-from formula_parser import parse_formula, composition_mass, FormulaError
-from fragmentation import generate_fragments, match_experimental, NEUTRAL_LOSSES
-from mass_calculator import SequenceError
+from peptmass.infra import exporters
+from peptmass.core import identification
+from peptmass.infra import pubchem
+from peptmass.core import scoring
+from peptmass.infra import spectra_io
+from peptmass.core.constants import PROTON_MASS
+from peptmass.core.formula_parser import parse_formula, composition_mass, FormulaError
+from peptmass.core.fragmentation import generate_fragments, match_experimental, NEUTRAL_LOSSES
+from peptmass.core.mass_calculator import SequenceError
 
 from . import state
 from .state import LOCK, get_state
@@ -400,7 +400,7 @@ def modifications():
                 m for m in lib.all() if m.position == "residue"]
         else:
             mods = lib.all()
-        custom = set(st.custom_mod_rows())
+        custom = set(st.custom_mod_ids())
         return _ok(modifications=[_mod_json(m, custom) for m in mods])
 
 

@@ -4,10 +4,10 @@ test_web.py
 ===========
 Verificacao da versao web (Flask test client, sem navegador):
 catalogos pt-BR/en/es com as mesmas chaves, telas nos 3 idiomas e 2 modos de
-cor, CSRF, calculos contra os valores do test_suite, biblioteca, exportacoes
+cor, CSRF, calculos contra os valores do test_science, biblioteca, exportacoes
 e a tela de Dados experimentais com o exemplo_PEPTIDE.mzML.
 
-    python test_web.py
+    python tests/test_web.py
 """
 
 import io
@@ -19,14 +19,15 @@ import sys
 import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(HERE)
 DATA = tempfile.mkdtemp(prefix="peptmass-web-test-")
 os.environ["PEPTMASS_DATA_DIR"] = DATA
-sys.path.insert(0, HERE)
+sys.path.insert(0, ROOT)
 
-from database import Database  # noqa: E402
-from modifications import DEFAULT_MODIFICATIONS  # noqa: E402
-from presets import PRESET_RENAMES, migrate_preset_names  # noqa: E402
-from web import create_app, catalog  # noqa: E402
+from peptmass.infra.database import Database  # noqa: E402
+from peptmass.core.modifications import DEFAULT_MODIFICATIONS  # noqa: E402
+from peptmass.core.presets import PRESET_RENAMES, migrate_preset_names  # noqa: E402
+from peptmass.web import create_app, catalog  # noqa: E402
 
 FAILS = []
 
@@ -48,7 +49,7 @@ def main():
         check(f"{lang}: mesmas chaves do pt-BR", cat == ref,
               f"faltam {sorted(ref - cat)[:5]} sobram {sorted(cat - ref)[:5]}")
     used = set()
-    for root, _dirs, files in os.walk(os.path.join(HERE, "web")):
+    for root, _dirs, files in os.walk(os.path.join(ROOT, "peptmass", "web")):
         if "vendor" in root:
             continue
         for name in files:
@@ -183,7 +184,7 @@ def main():
     check("FASTA", len(r["entries"]) == 2)
 
     print("== dados experimentais")
-    sample = os.path.join(HERE, "exemplo_PEPTIDE.mzML")
+    sample = os.path.join(HERE, "data", "exemplo_PEPTIDE.mzML")
     if not os.path.exists(sample):
         print("  (exemplo_PEPTIDE.mzML ausente: pulado)")
     else:

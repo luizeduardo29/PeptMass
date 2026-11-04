@@ -10,9 +10,10 @@ O resíduo é cadastrado pela fórmula molecular do AMINOÁCIDO LIVRE
 
 from dataclasses import dataclass
 
-from formula_parser import (parse_formula, composition_mass, add_composition,
+from peptmass.core.constants import AMINO_ACIDS
+from peptmass.core.formula_parser import (parse_formula, composition_mass, add_composition,
                             composition_to_string, FormulaError)
-from i18n import t as _
+from peptmass.core.i18n import t as _
 
 
 # Catálogo embutido de resíduos não-naturais comuns.
@@ -114,7 +115,6 @@ class CustomResidueManager:
         if not code.isalpha():
             raise ValueError(_("O código deve conter apenas letras (sem dígitos "
                                "ou símbolos). Ex.: Aib, Orn, Nle."))
-        from constants import AMINO_ACIDS
         # códigos de 1 letra não podem colidir com um aminoácido natural;
         # multi-caractere é sempre usado entre colchetes, então não há colisão.
         if len(code) == 1 and code in AMINO_ACIDS:

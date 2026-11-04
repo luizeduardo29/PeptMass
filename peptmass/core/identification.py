@@ -14,7 +14,7 @@ Estas métricas apoiam os critérios de identificação (massa do precursor, tem
 de retenção e íons diagnósticos são avaliados na interface).
 """
 
-from constants import PROTON_MASS
+from peptmass.core.constants import PROTON_MASS
 
 ISOTOPE_SPACING = 1.0033548   # Δm C13-C12 (espaçamento isotópico médio)
 

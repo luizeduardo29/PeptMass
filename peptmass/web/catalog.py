@@ -1,9 +1,9 @@
 """Traducoes da interface web (pt-BR, en, es) e o helper `_()`.
 
 Mesmo formato dos outros sistemas da Hub (DopingValidation, i18n.py de la):
-catalogos JSON planos (chave pontuada -> texto) em web/locales, para que um
+catalogos JSON planos (chave pontuada -> texto) em peptmass/web/locales, para que um
 laboratorio traduza sem mexer em codigo. As mensagens do NUCLEO (calculo,
-formulas, PubChem) continuam no i18n.py da raiz, ligado ao mesmo idioma por
+formulas, PubChem) ficam em peptmass/core/i18n.py, ligado ao mesmo idioma por
 requisicao (i18n.use_language).
 """
 

@@ -17,12 +17,12 @@ import re
 from dataclasses import dataclass, field
 from collections import defaultdict
 
-from constants import (AMINO_ACIDS, PROTON_MASS, ELEMENTS_MONO, ISOTOPES)
-from formula_parser import (parse_formula, composition_mass, add_composition,
+from peptmass.core.constants import (AMINO_ACIDS, PROTON_MASS, ELEMENTS_MONO, ISOTOPES)
+from peptmass.core.formula_parser import (parse_formula, composition_mass, add_composition,
                             composition_to_string)
-from modifications import ModificationLibrary
-from custom_residues import CustomResidue, BUILTIN_RESIDUES
-from i18n import t as _
+from peptmass.core.modifications import ModificationLibrary
+from peptmass.core.custom_residues import CustomResidue, BUILTIN_RESIDUES
+from peptmass.core.i18n import t as _
 
 
 @dataclass

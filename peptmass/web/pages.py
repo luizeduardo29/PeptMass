@@ -10,8 +10,8 @@ import json
 
 from flask import Blueprint, render_template
 
-from formula_parser import FormulaError
-from mass_calculator import SequenceError
+from peptmass.core.formula_parser import FormulaError
+from peptmass.core.mass_calculator import SequenceError
 
 from .state import LOCK, get_state
 
@@ -47,7 +47,7 @@ def home():
         st = get_state()
         residues = st.custom_manager.all()
         mods = st.mod_library.all()
-        custom_mods = st.custom_mod_rows()
+        custom_mods = st.custom_mod_ids()
         peptides = _saved_peptides(st)
     stats = {
         "peptides": len(peptides),
@@ -86,7 +86,7 @@ def library():
     with LOCK:
         st = get_state()
         residues = sorted(st.custom_manager.all(), key=lambda r: (r.builtin, r.code.lower()))
-        custom = set(st.custom_mod_rows())
+        custom = set(st.custom_mod_ids())
         mods = sorted(st.mod_library.all(),
                       key=lambda m: (m.name not in custom, m.position, m.name.lower()))
     return render_template("library.html", nav_active="library", residues=residues,

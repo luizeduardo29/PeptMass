@@ -1,17 +1,22 @@
 """
-test_suite.py
-=============
+test_science.py
+===============
 Validação científica do PeptMass (sem interface gráfica).
 Executa cálculos e compara com valores publicados de referência.
 
 Uso:
-    python test_suite.py
+    python tests/test_science.py
 """
 
-from mass_calculator import MassCalculator
-from fragmentation import generate_fragments
-from custom_residues import CustomResidueManager
-from database import Database
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from peptmass.core.mass_calculator import MassCalculator  # noqa: E402
+from peptmass.core.fragmentation import generate_fragments  # noqa: E402
+from peptmass.core.custom_residues import CustomResidueManager  # noqa: E402
+from peptmass.infra.database import Database  # noqa: E402
 
 PASS, FAIL = 0, 0
 

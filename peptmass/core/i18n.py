@@ -4,7 +4,7 @@ i18n.py
 Alternância de idioma (Português / Inglês) para a interface do PeptMass.
 
 Uso:
-    from i18n import t as _
+    from peptmass.core.i18n import t as _
     _("Massa Molecular")   -> "Molecular Mass" quando o idioma é 'en'
 
 As chaves são as próprias strings em português; o inglês fica no mapa `_EN`.
@@ -52,53 +52,6 @@ def t(s):
     if lang == "es":
         return _ES.get(s, s)
     return s
-
-
-def translate_tree(root):
-    """Traduz, in loco, todos os textos estáticos da árvore de widgets sob
-    `root` quando o idioma é inglês. Só altera strings presentes no mapa `_EN`
-    — dados do usuário (nomes de peptídeos, fórmulas, etc.) ficam intactos."""
-    if get_language() != "en":
-        return
-    from PyQt6.QtWidgets import (
-        QLabel, QGroupBox, QComboBox, QLineEdit, QPlainTextEdit, QTextEdit,
-        QAbstractButton, QTableWidget, QTabWidget, QWidget)
-    from PyQt6.QtGui import QAction
-
-    for w in root.findChildren(QWidget):
-        if isinstance(w, QGroupBox):
-            w.setTitle(t(w.title()))
-        elif isinstance(w, (QLabel, QAbstractButton)):
-            # botões, checkboxes, radios e rótulos (não QLineEdit)
-            txt = w.text()
-            if txt:
-                w.setText(t(txt))
-        if isinstance(w, (QLineEdit, QPlainTextEdit, QTextEdit)):
-            ph = w.placeholderText()
-            if ph:
-                w.setPlaceholderText(t(ph))
-        tip = w.toolTip()
-        if tip:
-            w.setToolTip(t(tip))
-    for tbl in root.findChildren(QTableWidget):
-        for c in range(tbl.columnCount()):
-            it = tbl.horizontalHeaderItem(c)
-            if it is not None:
-                it.setText(t(it.text()))
-    for cb in root.findChildren(QComboBox):
-        for i in range(cb.count()):
-            cb.setItemText(i, t(cb.itemText(i)))
-    for tw in root.findChildren(QTabWidget):
-        for i in range(tw.count()):
-            tw.setTabText(i, t(tw.tabText(i)))
-    for act in root.findChildren(QAction):
-        if act.text():
-            act.setText(t(act.text()))
-    try:
-        if root.windowTitle():
-            root.setWindowTitle(t(root.windowTitle()))
-    except Exception:
-        pass
 
 
 # --------------------------------------------------------------------------
@@ -338,8 +291,6 @@ _EN = {
     "Teór m/z": "Theor m/z",
     "(todos os scans)": "(all scans)",
     "{base} — {n} scans": "{base} — {n} scans",
-    "A leitura de espectros requer pyteomics/psims/lxml.\n\n{e}":
-        "Reading spectra requires pyteomics/psims/lxml.\n\n{e}",
     "Informe um m/z válido para o XIC.": "Enter a valid m/z for the XIC.",
     "Score (Morpheus): {score}   |   {n} íons casados   |   "
     "{tic}% da TIC explicada   |   cobertura {cov}%   |   "

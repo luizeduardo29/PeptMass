@@ -22,8 +22,8 @@ m/z multicarga: (massa_neutra + z·próton) / z
 
 from dataclasses import dataclass
 
-from constants import PROTON_MASS
-from formula_parser import formula_mass
+from peptmass.core.constants import PROTON_MASS
+from peptmass.core.formula_parser import add_composition, composition_mass, formula_mass
 
 # deltas neutros monoisotópicos
 _CO = formula_mass("CO")      # 27.994915
@@ -78,7 +78,6 @@ def _fmt_codes(codes):
 
 def _residue_masses(peptide_result):
     """Lista das massas monoisotópicas de cada resíduo (com modificações)."""
-    from formula_parser import composition_mass, add_composition
     masses = []
     seq_codes = []
     for code, info, mods in peptide_result.residues:

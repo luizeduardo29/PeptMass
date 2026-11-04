@@ -12,7 +12,7 @@ resíduos.
 from dataclasses import dataclass
 from typing import Optional
 
-from formula_parser import parse_formula, composition_mass, composition_to_string
+from peptmass.core.formula_parser import parse_formula, composition_mass, composition_to_string
 
 
 @dataclass

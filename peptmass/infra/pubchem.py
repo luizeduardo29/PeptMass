@@ -18,9 +18,9 @@ import urllib.parse
 import urllib.request
 from dataclasses import dataclass
 
-from formula_parser import (parse_formula, composition_mass,
+from peptmass.core.formula_parser import (parse_formula, composition_mass,
                             composition_to_string, FormulaError)
-from i18n import t as _
+from peptmass.core.i18n import t as _
 
 BASE = "https://pubchem.ncbi.nlm.nih.gov/rest/pug"
 _PROPS = "MolecularFormula,MonoisotopicMass,ExactMass,MolecularWeight,IUPACName"

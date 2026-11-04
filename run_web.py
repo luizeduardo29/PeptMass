@@ -20,7 +20,7 @@ de desenvolvimento do Flask.
 import argparse
 import os
 
-from web import create_app
+from peptmass.web import create_app
 
 
 def main():

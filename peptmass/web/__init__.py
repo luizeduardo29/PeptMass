@@ -15,8 +15,8 @@ import secrets
 
 from flask import Flask, g, jsonify, render_template, request
 
-import i18n as core_i18n
-from constants import PROTON_MASS
+from peptmass.core import i18n as core_i18n
+from peptmass.core.constants import PROTON_MASS
 
 from . import catalog, state
 
