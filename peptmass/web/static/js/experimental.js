@@ -7,7 +7,8 @@
   var PM = window.PM, T = PM.T, el = PM.el, num = PM.num;
   function $(id) { return document.getElementById(id); }
 
-  var N_TERM = { a: true, b: true, c: true };
+  var MAX_LABELS = 15, LABEL_GAP_PX = 14;
+  var SCAN_MARGIN = { l: 58, r: 18, t: 34, b: 46 };
   var runId = null, scan = null, spectrum = null, matches = [], chrom = null;
   var chromChart = $("graf-crom"), scanChart = $("graf-scan");
   var status = $("ms-estado");
@@ -181,6 +182,28 @@
     });
   }
 
+  function mzRange(mzs) {
+    return mzs.reduce(function (r, mz) { return [Math.min(r[0], mz), Math.max(r[1], mz)]; }, [Infinity, -Infinity]);
+  }
+
+  /* Legendas so dos ions mais intensos da faixa visivel, sem sobrepor: ao dar
+     zoom a faixa encolhe e os ions menores ganham legenda. */
+  function scanLabels(c, xMin, xMax) {
+    var visible = matches.filter(function (m) { return m.exp >= xMin && m.exp <= xMax; })
+      .sort(function (a, b) { return b.rel - a.rel; });
+    var plotWidth = Math.max(scanChart.clientWidth - SCAN_MARGIN.l - SCAN_MARGIN.r, 1);
+    var minGap = LABEL_GAP_PX * (xMax - xMin) / plotWidth;
+    var chosen = [];
+    visible.some(function (m) {
+      var fits = chosen.every(function (o) { return Math.abs(o.exp - m.exp) >= minGap; });
+      if (fits) chosen.push(m);
+      return chosen.length >= MAX_LABELS;
+    });
+    return chosen.reduce(function (out, m) {
+      return out.concat(PM.labels([m.exp], [Math.min(m.rel, 100)], [m.label], c.ions[m.type], 10));
+    }, []);
+  }
+
   function plotScan() {
     if (!spectrum) { PM.emptyChart(scanChart, T("ms.scan.pick")); return; }
     var c = PM.colors();
@@ -189,35 +212,47 @@
     mx = mx || 1;
     var norm = spectrum.intensity.map(function (i) { return 100 * i / mx; });
     var traces = [];
-    if ($("ms-ver-perfil").checked) {
-      traces.push({ type: "scatter", mode: "lines", x: spectrum.mz, y: norm, hoverinfo: "skip",
-                    line: { color: c.pico, width: 0.8 } });
-    } else {
-      traces.push(PM.sticks(spectrum.mz, norm, c.picoClaro, 0.8));
-    }
+    var peaks = $("ms-ver-perfil").checked
+      ? { type: "scatter", mode: "lines", x: spectrum.mz, y: norm, hoverinfo: "skip",
+          line: { color: c.pico, width: 0.8 } }
+      : PM.sticks(spectrum.mz, norm, c.pico, 0.8);
+    peaks.showlegend = false;
+    traces.push(peaks);
     var annotations = [];
     if (matches.length) {
-      var fs = matches.length <= 22 ? 10 : (matches.length <= 40 ? 9 : 8);
-      [["n", true], ["c", false]].forEach(function (pair) {
-        var list = matches.filter(function (m) { return !!N_TERM[m.type] === pair[1]; });
+      Object.keys(c.ions).forEach(function (ion) {
+        var list = matches.filter(function (m) { return m.type === ion; });
         if (!list.length) return;
-        var color = c[pair[0]];
+        var color = c.ions[ion];
         var xs = list.map(function (m) { return m.exp; });
         var ys = list.map(function (m) { return Math.min(m.rel, 100); });
-        traces.push(PM.sticks(xs, ys, color, 1.6));
+        var sticks = PM.sticks(xs, ys, color, 1.6);
+        sticks.name = ion;
+        traces.push(sticks);
         traces.push(PM.hoverPoints(xs, ys, list.map(function (m) {
           return "<b>" + m.label + "</b>  " + m.z + "+<br>exp " + num(m.exp, 4) + " · " + T("ms.col.theo") + " " +
                  num(m.theo, 4) + "<br>" + T("ms.col.error") + " " + num(m.err, 2, true) + " " + matchUnit + "<br>" + m.seq;
         }), color));
-        annotations = annotations.concat(PM.labels(xs, ys, list.map(function (m) { return m.label; }), color, fs));
       });
+      var range = mzRange(matches.map(function (m) { return m.exp; }).concat(spectrum.mz));
+      annotations = scanLabels(c, range[0], range[1]);
     }
     PM.plot(scanChart, traces, {
-      margin: { l: 58, r: 18, t: 18, b: 46 },
-      xaxis: { title: { text: "m/z" } },
+      showlegend: matches.length > 0,
+      legend: { orientation: "h", x: 0, y: 1.08, font: { color: c.texto }, itemclick: false, itemdoubleclick: false },
+      margin: SCAN_MARGIN,
+      xaxis: { title: { text: "m/z" }, showgrid: false },
       yaxis: { title: { text: T("chart.intensity_pct") }, range: [0, matches.length ? 140 : 105],
-               tickvals: [0, 20, 40, 60, 80, 100] },
+               tickvals: [0, 20, 40, 60, 80, 100], showgrid: false },
       annotations: annotations
+    });
+    // react() mantem os ouvintes, purge() (grafico vazio) os apaga: refaz sempre
+    if (scanChart.removeAllListeners) scanChart.removeAllListeners("plotly_relayout");
+    scanChart.on("plotly_relayout", function (ev) {
+      var zoomed = ev["xaxis.range[0]"] !== undefined || ev["xaxis.autorange"];
+      if (!zoomed || !matches.length) return;
+      var range = scanChart.layout.xaxis.range;
+      window.Plotly.relayout(scanChart, { annotations: scanLabels(PM.colors(), range[0], range[1]) });
     });
   }
 

@@ -7,8 +7,6 @@
   function $(id) { return document.getElementById(id); }
 
   // Cor por serie (tons medios: leem no claro e no escuro).
-  var SERIES = { "a": "#8a93a6", "b": "#3b82f6", "c": "#14b8a6", "x": "#d97706",
-                 "y": "#ef4444", "z": "#22a06b", "z+1": "#16a34a" };
   var MAX_LABELS = 400;
 
   var fragments = [], matched = {}, summary = null;
@@ -135,17 +133,17 @@
     if (!noLoss.length) { PM.emptyChart(chart, T("frag.none_selected")); return; }
     var c = PM.colors(), traces = [], xsAll = [], textsAll = [];
     var showLabels = $("f-rotulos").checked;
-    Object.keys(SERIES).forEach(function (s) {
+    Object.keys(c.ions).forEach(function (s) {
       var list = noLoss.filter(function (f) { return f.type === s; });
       if (!list.length) return;
       var xs = list.map(function (f) { return f.mz; });
       var ys = list.map(function () { return 100; });
-      var stick = PM.sticks(xs, ys, SERIES[s], 1.1);
+      var stick = PM.sticks(xs, ys, c.ions[s], 1.1);
       stick.name = s === "z+1" ? "z•" : s; stick.showlegend = true;
       traces.push(stick);
       traces.push(PM.hoverPoints(xs, ys, list.map(function (f) {
         return "<b>" + f.label + "</b>  " + f.z + "+<br>m/z " + num(f.mz, 4) + "<br>" + f.seq;
-      }), SERIES[s]));
+      }), c.ions[s]));
       xsAll = xsAll.concat(xs);
       textsAll = textsAll.concat(xs.map(function (x) { return num(x, 4); }));
     });

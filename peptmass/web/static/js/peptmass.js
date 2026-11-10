@@ -62,9 +62,11 @@
     return {
       fundo: token("grafico-fundo") || token("superficie"), grade: token("grafico-grade"),
       eixo: token("grafico-eixo"), texto: token("grafico-texto"), forte: token("texto"),
-      linha: token("grafico-linha"), xic: token("grafico-xic"), n: token("grafico-n"),
-      c: token("grafico-c"), pico: token("grafico-pico"), picoClaro: token("grafico-pico-claro"),
-      dica: token("grafico-dica-fundo"), fonte: token("fonte")
+      linha: token("grafico-linha"), xic: token("grafico-xic"),
+      c: token("grafico-c"), pico: token("grafico-pico"),
+      dica: token("grafico-dica-fundo"), fonte: token("fonte"),
+      ions: { a: token("ion-a"), b: token("ion-b"), c: token("ion-c"), x: token("ion-x"),
+              y: token("ion-y"), z: token("ion-z"), "z+1": token("ion-z") }
     };
   }
   function axis(c, extra) {

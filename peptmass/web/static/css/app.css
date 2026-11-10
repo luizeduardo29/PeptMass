@@ -73,10 +73,15 @@
   --grafico-texto:      var(--texto-suave);
   --grafico-linha:      #4d7c0f;
   --grafico-xic:        #1f8a5b;
-  --grafico-n:          #1d63d8;
   --grafico-c:          #c8362f;
+  /* series de ions: paleta validada para daltonismo, igual a do tema escuro em matiz */
+  --ion-a: #b0369a;
+  --ion-b: #1d63d8;
+  --ion-c: #009e73;
+  --ion-x: #e69f00;
+  --ion-y: #d5401f;
+  --ion-z: #56b4e9;
   --grafico-pico:       #a1a893;
-  --grafico-pico-claro: #d3d8c8;
   --grafico-dica-fundo: #ffffff;
 }
 
@@ -114,10 +119,14 @@
   --grafico-grade:      #2a3420;
   --grafico-linha:      #a3e635;
   --grafico-xic:        #3fd49a;
-  --grafico-n:          #6aa6ff;
   --grafico-c:          #ff8a80;
+  --ion-a: #c43fb0;
+  --ion-b: #2f6fe0;
+  --ion-c: #00a67a;
+  --ion-x: #e6a800;
+  --ion-y: #e8503a;
+  --ion-z: #7cc8f0;
   --grafico-pico:       #7f8a6e;
-  --grafico-pico-claro: #3f4a30;
   --grafico-dica-fundo: #212a15;
 }
 
