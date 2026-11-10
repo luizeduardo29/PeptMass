@@ -18,6 +18,7 @@
   <symbol id="i-fragmentos" viewBox="0 0 24 24"><path d="M3 21h18M6 21v-6M10 21V5M14 21v-9M18 21v-4"/></symbol>
   <symbol id="i-experimental" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></symbol>
   <symbol id="i-biblioteca" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></symbol>
+  <symbol id="i-ajuda" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01"/></symbol>
   <symbol id="i-globo" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></symbol>
   <symbol id="i-seta-baixo" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
   <symbol id="i-tema-claro" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></symbol>
@@ -47,6 +48,7 @@
     <a href="{{ url_for('pages.fragments') }}" class="{{ 'on' if nav_on == 'fragments' }}" title="{{ _('nav.fragments') }}"><svg class="icone" aria-hidden="true"><use href="#i-fragmentos"/></svg><span>{{ _('nav.fragments') }}</span></a>
     <a href="{{ url_for('pages.experimental') }}" class="{{ 'on' if nav_on == 'experimental' }}" title="{{ _('nav.experimental') }}"><svg class="icone" aria-hidden="true"><use href="#i-experimental"/></svg><span>{{ _('nav.experimental') }}</span></a>
     <a href="{{ url_for('pages.library') }}" class="{{ 'on' if nav_on == 'library' }}" title="{{ _('nav.library') }}"><svg class="icone" aria-hidden="true"><use href="#i-biblioteca"/></svg><span>{{ _('nav.library') }}</span></a>
+    <a href="{{ url_for('pages.guide') }}" class="{{ 'on' if nav_on == 'guide' }}" title="{{ _('nav.guide') }}"><svg class="icone" aria-hidden="true"><use href="#i-ajuda"/></svg><span>{{ _('nav.guide') }}</span></a>
   </nav>
   <div class="topo-controles">
     {% include "partials/_prefs.html" %}

@@ -200,8 +200,9 @@ de ambiente `PEPTMASS_THERMO_PARSER` (caminho do executável) ou coloque a pasta
 `ThermoRawFileParser/` na raiz do projeto. Sem ele, converta o `.raw` para mzML
 antes (ThermoRawFileParser ou msconvert).
 
-Há um arquivo de teste `tests/data/exemplo_PEPTIDE.mzML` (sintético, com os íons b/y do
-peptídeo PEPTIDE) para experimentar a aba sem dados próprios.
+Há um arquivo de exemplo `peptmass/web/static/exemplos/exemplo_PEPTIDE.mzML` (sintético,
+com os íons b/y do peptídeo PEPTIDE) para experimentar a aba sem dados próprios. Na web,
+a tela **Como usar** abre esse exemplo direto na tela de Dados experimentais.
 
 ---
 

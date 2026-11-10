@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+{% block page_class %} page-larga{% endblock %}
+
+{# Como usar: pagina de demonstracao. Cada secao explica um conceito com
+   controles ao vivo, calculados pela mesma API das outras telas. O peptideo
+   desta pagina e' proprio: mexer aqui nao altera o peptideo em edicao. #}
+{% block content %}
+<div class="cabecalho-pagina">
+  <div>
+    <h1>{{ _('guide.title') }}</h1>
+    <p class="lead">{{ _('guide.lead') }}</p>
+  </div>
+</div>
+
+<div class="guia">
+  <nav class="guia-indice" aria-label="{{ _('guide.toc') }}">
+    <p class="grupo-titulo">{{ _('guide.toc') }}</p>
+    <a href="#g-fluxo">{{ _('guide.flow.title') }}</a>
+    <a href="#g-massa">{{ _('guide.mass.title') }}</a>
+    <a href="#g-carga">{{ _('guide.charge.title') }}</a>
+    <a href="#g-isotopos">{{ _('guide.iso.title') }}</a>
+    <a href="#g-fragmentos">{{ _('guide.frag.title') }}</a>
+    <a href="#g-tolerancia">{{ _('guide.tol.title') }}</a>
+    <a href="#g-experimental">{{ _('guide.exp.title') }}</a>
+    <a href="#g-glossario">{{ _('guide.gloss.title') }}</a>
+  </nav>
+
+  <div class="guia-conteudo">
+    {# ------------------------------------------------------------ fluxo #}
+    <section class="card" id="g-fluxo">
+      <h2>{{ _('guide.flow.title') }}</h2>
+      <p class="guia-texto">{{ _('guide.flow.intro') }}</p>
+      <ol class="guia-fluxo">
+        {% for key, icon, endpoint in [('mass', 'i-massa', 'pages.mass'), ('fragments', 'i-fragmentos', 'pages.fragments'),
+                                        ('experimental', 'i-experimental', 'pages.experimental'), ('library', 'i-biblioteca', 'pages.library')] %}
+        <li>
+          <span class="numero">{{ loop.index }}</span>
+          <div>
+            <strong><svg class="icone" aria-hidden="true"><use href="#{{ icon }}"/></svg>{{ _('nav.' ~ key) }}</strong>
+            <p>{{ _('guide.flow.' ~ key) }}</p>
+            <a class="btn ghost pequeno" href="{{ url_for(endpoint) }}">{{ _('guide.flow.go') }}</a>
+          </div>
+        </li>
+        {% endfor %}
+      </ol>
+    </section>
+
+    {# ------------------------------------------------------------ massa #}
+    <section class="card" id="g-massa">
+      <h2><span class="numero">1</span>{{ _('guide.mass.title') }}</h2>
+      <p class="guia-texto">{{ _('guide.mass.intro') }}</p>
+      <div class="row">
+        <label class="campo cresce"><span>{{ _('guide.mass.seq') }}</span><input type="text" id="g-seq" class="mono" value="PEPTIDE" autocomplete="off" spellcheck="false"></label>
+      </div>
+      <div class="row centro guia-exemplos">
+        <span class="hint" style="margin:0">{{ _('guide.mass.examples') }}</span>
+        <button type="button" class="ghost pequeno" data-seq="PEPTIDE">PEPTIDE</button>
+        <button type="button" class="ghost pequeno" data-seq="RPPGFSPFR">Bradykinin</button>
+        <button type="button" class="ghost pequeno" data-seq="DRVYIHPF">Angiotensin II</button>
+        <button type="button" class="ghost pequeno" data-seq="RPKPQQFFGLM">Substance P</button>
+      </div>
+      <div class="marcas" style="margin-top:12px">
+        <label class="marca"><input type="checkbox" id="g-acetil">{{ _('guide.mass.acetyl') }}</label>
+        <label class="marca"><input type="checkbox" id="g-amida">{{ _('guide.mass.amidation') }}</label>
+      </div>
+      <div id="g-massa-erro" class="notice bad" style="margin-top:14px" hidden></div>
+      <div class="guia-par">
+        <dl class="kv" id="g-massa-kv">
+          <dt>{{ _('guide.mass.mono') }}</dt><dd id="g-mono">-</dd>
+          <dt>{{ _('guide.mass.avg') }}</dt><dd id="g-avg">-</dd>
+          <dt>{{ _('guide.mass.formula') }}</dt><dd id="g-formula" class="mono">-</dd>
+          <dt>{{ _('guide.mass.residues') }}</dt><dd id="g-residuos">-</dd>
+          <dt>{{ _('guide.mass.mods') }}</dt><dd id="g-delta">-</dd>
+        </dl>
+        <div class="guia-notas">
+          <p><strong>{{ _('guide.mass.mono') }}:</strong> {{ _('guide.mass.mono_help') }}</p>
+          <p><strong>{{ _('guide.mass.avg') }}:</strong> {{ _('guide.mass.avg_help') }}</p>
+        </div>
+      </div>
+    </section>
+
+    {# ------------------------------------------------------------ carga #}
+    <section class="card" id="g-carga">
+      <h2><span class="numero">2</span>{{ _('guide.charge.title') }}</h2>
+      <p class="guia-texto">{{ _('guide.charge.intro') }}</p>
+      <label class="campo guia-deslizante"><span>{{ _('guide.charge.z') }}: <output id="g-z-valor">2</output>+</span>
+        <input type="range" id="g-z" min="1" max="6" value="2"></label>
+      <div class="guia-formula" id="g-z-formula">-</div>
+      <p class="grupo-titulo" style="margin-top:16px">{{ _('guide.charge.table') }}</p>
+      <div class="guia-cargas" id="g-cargas"></div>
+    </section>
+
+    {# --------------------------------------------------------- isotopos #}
+    <section class="card" id="g-isotopos">
+      <h2><span class="numero">3</span>{{ _('guide.iso.title') }}</h2>
+      <p class="guia-texto">{{ _('guide.iso.intro') }}</p>
+      <label class="campo guia-deslizante"><span>{{ _('guide.iso.repeat') }}: <output id="g-rep-valor">1×</output></span>
+        <input type="range" id="g-rep" min="1" max="12" value="1"></label>
+      <div class="grafico baixo" id="g-graf-iso"></div>
+      <p class="guia-destaque" id="g-iso-topo">-</p>
+      <p class="hint">{{ _('guide.iso.limit') }}</p>
+    </section>
+
+    {# ------------------------------------------------------- fragmentos #}
+    <section class="card" id="g-fragmentos">
+      <h2><span class="numero">4</span>{{ _('guide.frag.title') }}</h2>
+      <p class="guia-texto">{{ _('guide.frag.intro') }}</p>
+      <div class="row centro">
+        <span class="grupo-titulo" style="margin:0">{{ _('guide.frag.pair') }}</span>
+        <div class="segmentado" id="g-par" role="radiogroup">
+          <label><input type="radio" name="g-par" value="a,x">a / x</label>
+          <label><input type="radio" name="g-par" value="b,y" checked>b / y</label>
+          <label><input type="radio" name="g-par" value="c,z">c / z</label>
+        </div>
+      </div>
+      <p class="hint">{{ _('guide.frag.click') }}</p>
+      <div class="guia-sequencia" id="g-sequencia"></div>
+      <div class="guia-quebra" id="g-quebra">-</div>
+      <p class="grupo-titulo" style="margin-top:16px">{{ _('guide.frag.spectrum') }}</p>
+      <div class="grafico baixo" id="g-graf-frag"></div>
+    </section>
+
+    {# -------------------------------------------------------- tolerancia #}
+    <section class="card" id="g-tolerancia">
+      <h2><span class="numero">5</span>{{ _('guide.tol.title') }}</h2>
+      <p class="guia-texto">{{ _('guide.tol.intro') }}</p>
+      <div class="guia-formula">{{ _('guide.tol.formula') }}</div>
+      <p class="hint">{{ _('guide.tol.simulated') }}</p>
+      <label class="campo guia-deslizante"><span>{{ _('guide.tol.slider') }}: <output id="g-tol-valor">10</output> ppm</span>
+        <input type="range" id="g-tol" min="1" max="60" value="10"></label>
+      <div id="g-tol-aviso" class="notice" style="margin-top:12px">-</div>
+      <div class="grafico baixo" id="g-graf-tol"></div>
+      <div class="table-wrap media" style="margin-top:12px">
+        <table id="g-tab-tol">
+          <thead>
+            <tr>
+              <th>{{ _('guide.tol.col.ion') }}</th>
+              <th class="num">{{ _('guide.tol.col.theo') }}</th>
+              <th class="num">{{ _('guide.tol.col.exp') }}</th>
+              <th class="num">{{ _('guide.tol.col.err') }}</th>
+              <th>{{ _('guide.tol.col.state') }}</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    {# ------------------------------------------------------ experimental #}
+    <section class="card" id="g-experimental">
+      <h2><span class="numero">6</span>{{ _('guide.exp.title') }}</h2>
+      <p class="guia-texto">{{ _('guide.exp.intro') }}</p>
+      <ol class="guia-passos">
+        <li>{{ _('guide.exp.step1') }}</li>
+        <li>{{ _('guide.exp.step2') }}</li>
+        <li>{{ _('guide.exp.step3') }}</li>
+        <li>{{ _('guide.exp.step4') }}</li>
+      </ol>
+      <div class="row centro">
+        <button type="button" id="g-abrir-exemplo"><svg class="icone" aria-hidden="true"><use href="#i-experimental"/></svg>{{ _('guide.exp.try') }}</button>
+        <span class="hint" style="margin:0">{{ _('guide.exp.try_help') }}</span>
+      </div>
+      <p class="grupo-titulo" style="margin-top:20px">{{ _('guide.exp.criteria') }}</p>
+      <ul class="guia-criterios">
+        <li><span class="tag ok">✓ {{ _('guide.exp.c_precursor_tag') }}</span>{{ _('guide.exp.c_precursor') }}</li>
+        <li><span class="tag ok">✓ {{ _('guide.exp.c_ions_tag') }}</span>{{ _('guide.exp.c_ions') }}</li>
+        <li><span class="tag warn">~ {{ _('guide.exp.c_isotopes_tag') }}</span>{{ _('guide.exp.c_isotopes') }}</li>
+        <li><span class="tag bad">✗ {{ _('guide.exp.c_rt_tag') }}</span>{{ _('guide.exp.c_rt') }}</li>
+      </ul>
+      <div class="notice warn">{{ _('guide.exp.c_note') }}</div>
+      <p class="guia-texto"><strong>{{ _('guide.exp.score_title') }}:</strong> {{ _('guide.exp.score') }}</p>
+      <p class="guia-texto"><strong>{{ _('guide.exp.chart_title') }}:</strong> {{ _('guide.exp.chart') }}</p>
+    </section>
+
+    {# --------------------------------------------------------- glossario #}
+    <section class="card" id="g-glossario">
+      <h2>{{ _('guide.gloss.title') }}<span class="spacer"></span>
+        <input type="search" id="g-busca" placeholder="{{ _('guide.gloss.search') }}" style="max-width:280px"></h2>
+      <dl class="guia-glossario" id="g-termos">
+        {% for term in glossary %}
+        <div data-termo>
+          <dt>{{ _('guide.g.' ~ term ~ '.t') }}</dt>
+          <dd>{{ _('guide.g.' ~ term ~ '.d') }}</dd>
+        </div>
+        {% endfor %}
+      </dl>
+      <p class="vazio" id="g-busca-vazio" hidden>{{ _('guide.gloss.none') }}</p>
+    </section>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>window.PEPTMASS_EXEMPLO = {{ url_for('pages.experimental', exemplo=1) | tojson }};</script>
+<script src="{{ url_for('static', filename='vendor/plotly-3.1.0.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/peptmass.js') }}"></script>
+<script src="{{ url_for('static', filename='js/guide.js') }}"></script>
+{% endblock %}

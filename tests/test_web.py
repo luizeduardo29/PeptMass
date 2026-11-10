@@ -61,12 +61,16 @@ def main():
     print("== telas")
     for lang in ("pt-BR", "en", "es"):
         for tema in ("claro", "escuro"):
-            for path in ("/", "/massa", "/fragmentacao", "/experimental", "/biblioteca"):
+            for path in ("/", "/massa", "/fragmentacao", "/experimental", "/biblioteca", "/como-usar"):
                 r = client.get(f"{path}?lang={lang}&tema={tema}")
                 html = r.get_data(as_text=True)
                 ok = (r.status_code == 200 and f'lang="{lang}"' in html
                       and f'data-tema="{tema}"' in html)
                 check(f"GET {path} [{lang}/{tema}]", ok, r.status_code)
+        guide = client.get(f"/como-usar?lang={lang}").get_data(as_text=True)
+        # chave sem traducao aparece crua no HTML (o glossario monta as chaves no laco)
+        raw_keys = re.findall(r">\s*(guide\.[\w.]+)\s*<", guide)
+        check(f"como usar sem chave crua ({lang})", not raw_keys, raw_keys[:5])
     r = client.get("/massa", headers={"Cookie": "peptmass_lang=es; peptmass_tema=escuro"})
     html = r.get_data(as_text=True)
     check("cookie de idioma/tema respeitado", 'lang="es"' in html and 'data-tema="escuro"' in html)
@@ -154,7 +158,7 @@ def main():
     check("remover", client.delete("/api/peptide?name=Teste%20web", headers=H).get_json()["ok"])
     check("home lista com massas", "Semaglutide" in client.get("/").get_data(as_text=True))
     for lang in ("pt-BR", "en", "es"):
-        for rota in ("/", "/massa", "/fragmentacao", "/experimental", "/biblioteca"):
+        for rota in ("/", "/massa", "/fragmentacao", "/experimental", "/biblioteca", "/como-usar"):
             html = client.get(f"{rota}?lang={lang}").get_data(as_text=True)
             check(f"sem travessao {rota} ({lang})", "\u2014" not in html and "\u2013" not in html)
     check("descricoes sem travessao", not any(
@@ -184,7 +188,7 @@ def main():
     check("FASTA", len(r["entries"]) == 2)
 
     print("== dados experimentais")
-    sample = os.path.join(HERE, "data", "exemplo_PEPTIDE.mzML")
+    sample = os.path.join(ROOT, "peptmass", "web", "static", "exemplos", "exemplo_PEPTIDE.mzML")
     if not os.path.exists(sample):
         print("  (exemplo_PEPTIDE.mzML ausente: pulado)")
     else:

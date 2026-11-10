@@ -14,7 +14,7 @@
 
 <section class="card">
   <h2><span class="numero">1</span>{{ _('ms.file.title') }}</h2>
-  <form id="ms-form" class="row">
+  <form id="ms-form" class="row" data-exemplo="{{ url_for('static', filename='exemplos/exemplo_PEPTIDE.mzML') }}">
     <label class="campo cresce"><span>{{ _('ms.file.label') }}</span><input type="file" id="ms-arquivo" accept=".mzML,.mzml,.mzXML,.mzxml,.raw"></label>
     <label class="marca simples" style="margin-bottom:10px" title="{{ _('ms.file.profile_help') }}"><input type="checkbox" id="ms-perfil">{{ _('ms.file.profile') }}</label>
     <button type="submit" id="ms-abrir"><svg class="icone" aria-hidden="true"><use href="#i-enviar"/></svg>{{ _('ms.file.open') }}</button>

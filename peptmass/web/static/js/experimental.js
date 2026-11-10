@@ -56,6 +56,19 @@
     event.preventDefault();
     var file = $("ms-arquivo").files[0];
     if (!file) { PM.setState(status, T("ms.no_file"), "warn"); return; }
+    openFile(file);
+  });
+
+  /* ?exemplo=1 (vindo da tela Como usar): abre o arquivo de exemplo incluso */
+  function openExample() {
+    var url = $("ms-form").getAttribute("data-exemplo");
+    window.history.replaceState(null, "", window.location.pathname);
+    fetch(url).then(function (r) { return r.blob(); }).then(function (blob) {
+      openFile(new File([blob], url.split("/").pop()));
+    });
+  }
+
+  function openFile(file) {
     var form = new FormData();
     form.append("file", file);
     form.append("profile", $("ms-perfil").checked ? "1" : "0");
@@ -76,7 +89,7 @@
       resetScan();
       loadFilters();
     });
-  });
+  }
 
   function loadFilters() {
     if (!runId) return;
@@ -350,4 +363,5 @@
   $("ms-sem-peptideo").hidden = PM.peptide.has();
   PM.emptyChart(chromChart, T("ms.file.none"));
   PM.emptyChart(scanChart, T("ms.scan.pick"));
+  if (new URLSearchParams(window.location.search).has("exemplo")) openExample();
 })();

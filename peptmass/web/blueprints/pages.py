@@ -1,4 +1,4 @@
-"""Telas: Inicio, Massa, Fragmentacao, Dados experimentais e Biblioteca.
+"""Telas: Inicio, Massa, Fragmentacao, Dados experimentais, Biblioteca e Como usar.
 
 As telas sao HTML do servidor (Jinja) com o comportamento em JavaScript
 (static/js) falando com a API (blueprints/api).
@@ -78,6 +78,17 @@ def fragments():
 @bp.get("/experimental")
 def experimental():
     return render_template("experimental.html", nav_active="experimental")
+
+
+GLOSSARY = ("da", "mz", "mono", "avg", "charge", "ppm", "envelope", "ms1ms2", "precursor",
+            "ions", "loss", "nc", "mod", "nonnatural", "tic", "xic", "rt", "centroid",
+            "morpheus")
+
+
+@bp.get("/como-usar")
+def guide():
+    """Pagina de demonstracao: os conceitos e o fluxo, com controles ao vivo."""
+    return render_template("guide.html", nav_active="guide", glossary=GLOSSARY)
 
 
 @bp.get("/biblioteca")

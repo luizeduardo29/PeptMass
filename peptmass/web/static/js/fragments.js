@@ -6,7 +6,6 @@
   var PM = window.PM, T = PM.T, el = PM.el, num = PM.num;
   function $(id) { return document.getElementById(id); }
 
-  // Cor por serie (tons medios: leem no claro e no escuro).
   var MAX_LABELS = 400;
 
   var fragments = [], matched = {}, summary = null;

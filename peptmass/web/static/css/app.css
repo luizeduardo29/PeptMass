@@ -64,9 +64,8 @@
   --topo-altura: 66px;
 
   /* Graficos (Plotly): o JavaScript le estes tokens e redesenha ao trocar
-     o modo de cor. Ions N-terminais (a/b/c) em azul e C-terminais (x/y/z) em
-     vermelho, como no desktop: e' codigo de dados, nao tema, e limao contra
-     vermelho nao se distingue em daltonismo vermelho-verde. */
+     o modo de cor. Cada serie de ions (--ion-*) tem sua cor: e' codigo de
+     dados, nao tema, por isso nao usa o limao da marca. */
   --grafico-fundo:      var(--superficie);
   --grafico-grade:      #eff2e6;
   --grafico-eixo:       var(--borda-forte);
@@ -619,6 +618,64 @@ table.tabela-simples td.destaque a:hover { color: var(--marca-escuro); }
 
 :focus-visible { outline: 2px solid var(--marca-escuro); outline-offset: 2px; }
 
+/* ---------------------------------------------------------------- como usar */
+
+.guia { display: grid; grid-template-columns: 210px minmax(0, 1fr); gap: 24px; align-items: start; }
+.guia-indice { position: sticky; top: calc(var(--topo-altura) + 20px); display: flex; flex-direction: column; gap: 2px; }
+.guia-indice a { padding: 7px 10px; border-radius: 8px; color: var(--texto-suave); text-decoration: none; font-size: 13.5px; }
+.guia-indice a:hover { background: var(--marca-suave); color: var(--marca-texto); }
+.guia-conteudo > .card { scroll-margin-top: calc(var(--topo-altura) + 20px); }
+.guia-texto { color: var(--texto-suave); font-size: 14px; line-height: 1.6; max-width: 85ch; margin: 0 0 14px; }
+.guia-exemplos { margin-top: 10px; }
+
+.guia-fluxo { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.guia-fluxo li { display: flex; gap: 10px; align-items: flex-start; padding: 14px; border: 1px solid var(--borda); border-radius: var(--raio); background: var(--superficie-alt); }
+.guia-fluxo strong { display: flex; align-items: center; gap: 6px; }
+.guia-fluxo p { color: var(--texto-suave); font-size: 13px; line-height: 1.5; margin: 6px 0 10px; }
+
+.guia-par { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.guia-notas p { color: var(--texto-suave); font-size: 13.5px; line-height: 1.6; margin: 14px 0 0; }
+.guia-notas strong { color: var(--texto); }
+
+.guia-deslizante { max-width: 420px; margin: 4px 0 6px; }
+.guia-deslizante output { color: var(--marca-texto); font-variant-numeric: tabular-nums; }
+.guia-deslizante input[type=range] { width: 100%; accent-color: var(--marca); padding: 0; border: 0; background: none; box-shadow: none; }
+
+.guia-formula { font-family: var(--mono); font-size: 13.5px; padding: 12px 14px; border-radius: var(--raio); background: var(--superficie-alt); border: 1px solid var(--borda); overflow-wrap: anywhere; margin: 8px 0; }
+.guia-formula b { color: var(--marca-texto); }
+.guia-destaque { font-weight: 600; margin: 10px 0 0; }
+
+.guia-cargas { display: flex; flex-wrap: wrap; gap: 8px; }
+.guia-cargas span { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--borda); font-variant-numeric: tabular-nums; font-size: 13px; }
+.guia-cargas span.on { border-color: var(--marca); background: var(--marca-suave); color: var(--marca-texto); font-weight: 650; }
+
+.segmentado { display: inline-flex; border: 1px solid var(--borda-forte); border-radius: 9px; overflow: hidden; }
+.segmentado label { padding: 6px 12px; font-size: 13px; cursor: pointer; border-left: 1px solid var(--borda); }
+.segmentado label:first-child { border-left: 0; }
+.segmentado input { position: absolute; opacity: 0; pointer-events: none; }
+.segmentado label:has(input:checked) { background: var(--marca-suave); color: var(--marca-texto); font-weight: 650; }
+.segmentado label:has(input:focus-visible) { outline: 2px solid var(--marca-escuro); outline-offset: -2px; }
+
+.guia-sequencia { display: flex; flex-wrap: wrap; align-items: center; row-gap: 10px; margin: 14px 0 6px; }
+.guia-sequencia .residuo { min-width: 34px; height: 38px; padding: 0 6px; display: grid; place-items: center; border-radius: 8px; font-family: var(--mono); font-weight: 700; border: 2px solid var(--borda-forte); color: var(--texto); }
+.guia-sequencia .residuo.n { border-color: var(--cor-n); color: var(--cor-n); }
+.guia-sequencia .residuo.c { border-color: var(--cor-c); color: var(--cor-c); }
+.guia-sequencia .ligacao { width: 22px; height: 38px; padding: 0; border: 0; background: none; box-shadow: none; cursor: pointer; position: relative; }
+.guia-sequencia .ligacao::before { content: ""; position: absolute; left: 50%; top: 8px; bottom: 8px; width: 2px; transform: translateX(-50%); background: var(--borda-forte); }
+.guia-sequencia .ligacao:hover::before, .guia-sequencia .ligacao.on::before { width: 4px; background: var(--marca); }
+.guia-quebra { display: flex; flex-wrap: wrap; gap: 10px 24px; font-size: 14px; }
+.guia-quebra .ion { font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.guia-passos { margin: 0 0 16px; padding-left: 22px; color: var(--texto-suave); font-size: 14px; line-height: 1.7; }
+.guia-criterios { list-style: none; padding: 0; margin: 0 0 14px; display: grid; gap: 10px; }
+.guia-criterios li { display: flex; gap: 10px; align-items: baseline; color: var(--texto-suave); font-size: 13.5px; line-height: 1.5; }
+.guia-criterios .tag { flex: 0 0 auto; }
+
+.guia-glossario { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 24px; margin: 0; }
+.guia-glossario div { padding: 10px 0; border-bottom: 1px solid var(--borda); }
+.guia-glossario dt { font-weight: 700; }
+.guia-glossario dd { margin: 4px 0 0; color: var(--texto-suave); font-size: 13.5px; line-height: 1.55; }
+
 /* --------------------------------------------------------------- responsivo */
 
 @media (max-width: 1320px) {
@@ -632,6 +689,15 @@ table.tabela-simples td.destaque a:hover { color: var(--marca-escuro); }
 
 @media (max-width: 980px) {
   .colunas, .colunas.estreita { grid-template-columns: 1fr; }
+  .guia { grid-template-columns: minmax(0, 1fr); }
+  .guia-indice { position: static; flex-direction: row; flex-wrap: wrap; gap: 4px; }
+  .guia-indice .grupo-titulo { width: 100%; }
+  .guia-fluxo { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .guia-par, .guia-glossario { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 620px) {
+  .guia-fluxo { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 900px) {
