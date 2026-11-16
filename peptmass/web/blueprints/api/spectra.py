@@ -9,7 +9,7 @@ from flask import g, request
 
 from peptmass.core import identification, scoring
 from peptmass.core.fragmentation import NEUTRAL_LOSSES, match_experimental
-from peptmass.infra import spectra_io
+from peptmass.infra import raw_reader, spectra_io
 from peptmass.web import state
 from peptmass.web.state import LOCK, get_state
 
@@ -47,13 +47,70 @@ def ms_open():
     path = os.path.join(folder, "dados" + ext)
     upload.save(path)
     try:
-        run = spectra_io.open_run(path, profile=request.form.get("profile") == "1")
+        # O mzML convertido de um .raw fica na propria pasta do envio, que
+        # drop_run (e a limpeza na subida) apagam.
+        run = spectra_io.open_run(path, profile=request.form.get("profile") == "1",
+                                  work_dir=folder)
     except Exception as exc:  # noqa: BLE001 - qualquer falha de leitura vira aviso
         shutil.rmtree(folder, ignore_errors=True)
         raise ApiError(g._("ms.open_error", e=exc)) from exc
+    if ext == ".raw":
+        # Depois de convertido, o .raw enviado nao e' mais lido: libera o disco.
+        try:
+            os.remove(path)
+        except OSError:
+            pass
     state.add_run(rid, run, folder, filename)
     return ok(run_id=rid, filename=filename, n_scans=len(run.scans),
                levels=run.ms_levels())
+
+
+# --------------------------------------------------------------------------
+# Leitor de .raw (ThermoRawFileParser) instalado pelo proprio usuario. So no
+# executavel (PEPTMASS_DESKTOP=1, servidor em 127.0.0.1): no servidor de rede
+# e no container o botao nao aparece e as rotas recusam.
+# --------------------------------------------------------------------------
+def _desktop() -> bool:
+    return os.environ.get("PEPTMASS_DESKTOP") == "1" and raw_reader.supported()
+
+
+def _require_desktop():
+    if not _desktop():
+        raise ApiError(g._("ms.reader.unavailable"), 403)
+
+
+@bp.get("/api/raw-reader")
+def raw_reader_status():
+    available = bool(spectra_io.find_thermo_parser())
+    return ok(available=available, installable=_desktop() and not available,
+              version=raw_reader.VERSION)
+
+
+@bp.post("/api/raw-reader/download")
+def raw_reader_download():
+    _require_desktop()
+    try:
+        info = raw_reader.download()
+    except raw_reader.RawReaderError as exc:
+        raise ApiError(str(exc), 502) from exc
+    return ok(**info)
+
+
+@bp.post("/api/raw-reader/accept")
+def raw_reader_accept():
+    _require_desktop()
+    try:
+        raw_reader.accept()
+    except raw_reader.RawReaderError as exc:
+        raise ApiError(str(exc)) from exc
+    return ok(available=bool(spectra_io.find_thermo_parser()))
+
+
+@bp.post("/api/raw-reader/cancel")
+def raw_reader_cancel():
+    _require_desktop()
+    raw_reader.cancel()
+    return ok()
 
 
 @bp.get("/api/ms/<rid>/filters")

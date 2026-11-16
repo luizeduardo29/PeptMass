@@ -1,0 +1,74 @@
+# Gera o executavel do PeptMass (desktop) para Windows.
+# macOS e Linux usam a versao web em container (Dockerfile / docker-compose.yml).
+#
+# - Ao publicar uma tag "v*" (ex.: v1.0): monta o pacote e anexa na Release.
+# - Manualmente (aba Actions > Executaveis > Run workflow): monta o pacote e
+#   deixa para download como artefato da execucao, sem criar Release.
+#
+# O Python vai dentro do pacote: quem baixa nao precisa ter Python instalado.
+name: Executaveis
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: ${{ matrix.nome }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - nome: Windows
+            os: windows-latest
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Dependencias
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements/build.txt
+
+      - name: PyInstaller
+        run: python -m PyInstaller packaging/peptmass.spec --noconfirm --clean
+
+      - name: Nome da versao
+        id: versao
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then v="${GITHUB_REF_NAME#v}"; else v="dev-${GITHUB_SHA::7}"; fi
+          echo "v=$v" >> "$GITHUB_OUTPUT"
+
+      - name: Compactar (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: Compress-Archive -Path dist/PeptMass -DestinationPath "PeptMass-${{ steps.versao.outputs.v }}-Windows.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PeptMass-${{ matrix.nome }}
+          path: PeptMass-*.*
+          if-no-files-found: error
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: pacotes
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: pacotes/*

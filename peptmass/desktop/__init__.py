@@ -1,5 +1,1 @@
-"""Interface desktop (PyQt6). O backend do matplotlib precisa vir antes dos graficos."""
-
-import matplotlib
-
-matplotlib.use("QtAgg")
+"""PeptMass desktop: a interface web numa janela propria (peptmass.desktop.app)."""

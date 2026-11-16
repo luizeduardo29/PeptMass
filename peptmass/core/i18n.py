@@ -348,6 +348,101 @@ _EN = {
     "Nenhuma propriedade retornada.": "No properties returned.",
     "CID não encontrado.": "CID not found.",
     "Não foi possível obter a imagem: {e}": "Could not fetch the image: {e}",
+    # ---- Desktop no visual do site (topo, títulos e cartões) ----
+    "Massa": "Mass",
+    "Fragmentação": "Fragmentation",
+    "Dados experimentais": "Experimental data",
+    "Massa molecular": "Molecular mass",
+    "O cálculo é refeito enquanto você digita. O peptídeo fica disponível "
+    "nas telas de Fragmentação e Dados experimentais.":
+        "The calculation updates as you type. The peptide is available on "
+        "the Fragmentation and Experimental data screens.",
+    "Fragmentação MS/MS": "MS/MS fragmentation",
+    "Séries teóricas do peptídeo da tela de Massa. Marque séries, perdas e "
+    "cargas; a tabela e o espectro se atualizam na hora.":
+        "Theoretical series of the peptide from the Mass screen. Tick series, "
+        "losses and charges; the table and the spectrum update right away.",
+    "Compare o espectro teórico com um espectro real: abra o arquivo, "
+    "escolha o scan no cromatograma e case com os fragmentos do peptídeo "
+    "da tela de Massa.":
+        "Compare the theoretical spectrum with a real one: open the file, "
+        "pick the scan on the chromatogram and match it against the "
+        "fragments of the peptide from the Mass screen.",
+    "Massas e fragmentação MS/MS de peptídeos":
+        "Peptide masses and MS/MS fragmentation",
+    "Biblioteca": "Library",
+    "Novo aminoácido…": "New amino acid…",
+    "Buscar no PubChem…": "Search PubChem…",
+    "Modo de cor": "Color mode",
+    "Claro": "Light",
+    "Escuro": "Dark",
+    "Massas monoisotópicas IUPAC · próton = {p} Da · 6 casas decimais · v1.0":
+        "IUPAC monoisotopic masses · proton = {p} Da · 6 decimal places · v1.0",
+    "Aminoácidos não naturais": "Non-natural amino acids",
+    "Mono (Da)": "Mono (Da)",
+    "N-terminal": "N-terminal",
+    "C-terminal": "C-terminal",
+    "Modificações por resíduo": "Per-residue modifications",
+    "Extras": "Extra",
+    "Carga do envelope": "Envelope charge",
+    "0 = massa neutra (M). Passe o mouse sobre os picos; use a lupa para dar "
+    "zoom e a casa para voltar.":
+        "0 = neutral mass (M). Hover over the peaks; use the magnifier to "
+        "zoom and the house to go back.",
+    "m/z (neutro)": "m/z (neutral)",
+    "Intensidade (%)": "Intensity (%)",
+    "Massa monoisotópica": "Monoisotopic mass",
+    "Massa média": "Average mass",
+    "Resíduos": "Residues",
+    "Peptídeo": "Peptide",
+    "Editar na tela de Massa": "Edit on the Mass screen",
+    "Busca rápida (ex.: b5, y, 2+, -H2O)…": "Quick search (e.g. b5, y, 2+, -H2O)…",
+    "Intensidade rel.": "Rel. intensity",
+    "{a} de {b} fragmentos": "{a} of {b} fragments",
+    "Arquivo de MS": "MS file",
+    "Arquivo (.mzML, .mzXML ou .raw)": "File (.mzML, .mzXML or .raw)",
+    "Nível MS": "MS level",
+    "Filtro de scan": "Scan filter",
+    "Cromatograma": "Chromatogram",
+    "Clique num ponto do cromatograma para escolher o scan daquele tempo "
+    "de retenção.":
+        "Click a point on the chromatogram to pick the scan at that retention time.",
+    "Espectro do scan": "Scan spectrum",
+    "nenhum scan": "no scan",
+    "Séries": "Series",
+    "Cargas": "Charges",
+    "Tolerância": "Tolerance",
+    "Carga precursor": "Precursor charge",
+    "RT esperado (min)": "Expected RT (min)",
+    "± janela": "± window",
+    "Critérios de identificação": "Identification criteria",
+    "Duplo-clique numa linha para ver o XIC daquele íon.":
+        "Double-click a row to see the XIC of that ion.",
+    "Copiar": "Copy",
+    "Abund.%": "Abund.%",
+    "Subseq": "Subseq.",
+    "{base} · {n} scans": "{base} · {n} scans",
+    "{p} · {n} íons anotados": "{p} · {n} ions annotated",
+    "{f}   —   {n} scans": "{f}   —   {n} scans",
+    "Para abrir .raw é preciso o leitor ThermoRawFileParser, que não vem "
+    "com o PeptMass. No programa para Windows, use o botão \"Instalar "
+    "leitor de .raw\" desta tela. Outra opção: converta o .raw para "
+    "mzML e abra o mzML.":
+        "Opening .raw files requires the ThermoRawFileParser reader, which "
+        "is not shipped with PeptMass. In the Windows program, use the "
+        "\"Install .raw reader\" button on this screen. Alternatively, "
+        "convert the .raw file to mzML and open the mzML.",
+    "Não foi possível baixar o leitor de .raw: {e}":
+        "Could not download the .raw reader: {e}",
+    "O download do leitor de .raw veio maior que o esperado.":
+        "The .raw reader download was larger than expected.",
+    "O arquivo baixado não confere com a versão oficial do leitor de .raw. "
+    "Nada foi instalado.":
+        "The downloaded file does not match the official .raw reader "
+        "release. Nothing was installed.",
+    "Pacote do leitor de .raw inválido.": "Invalid .raw reader package.",
+    "Baixe o leitor de .raw antes de instalar.":
+        "Download the .raw reader before installing.",
 }
 
 
@@ -397,4 +492,23 @@ _ES = {
     "Nenhuma propriedade retornada.": "No se devolvió ninguna propiedad.",
     "CID não encontrado.": "CID no encontrado.",
     "Não foi possível obter a imagem: {e}": "No se pudo obtener la imagen: {e}",
+    "Para abrir .raw é preciso o leitor ThermoRawFileParser, que não vem "
+    "com o PeptMass. No programa para Windows, use o botão \"Instalar "
+    "leitor de .raw\" desta tela. Outra opção: converta o .raw para "
+    "mzML e abra o mzML.":
+        "Para abrir .raw se necesita el lector ThermoRawFileParser, que no "
+        "viene con PeptMass. En el programa para Windows, use el botón "
+        "\"Instalar lector de .raw\" de esta pantalla. Otra opción: "
+        "convierta el .raw a mzML y abra el mzML.",
+    "Não foi possível baixar o leitor de .raw: {e}":
+        "No se pudo descargar el lector de .raw: {e}",
+    "O download do leitor de .raw veio maior que o esperado.":
+        "La descarga del lector de .raw fue mayor de lo esperado.",
+    "O arquivo baixado não confere com a versão oficial do leitor de .raw. "
+    "Nada foi instalado.":
+        "El archivo descargado no coincide con la versión oficial del lector "
+        "de .raw. No se instaló nada.",
+    "Pacote do leitor de .raw inválido.": "Paquete del lector de .raw no válido.",
+    "Baixe o leitor de .raw antes de instalar.":
+        "Descargue el lector de .raw antes de instalar.",
 }

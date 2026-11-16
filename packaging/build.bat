@@ -41,12 +41,15 @@ if errorlevel 1 goto fail
 "%PYTHON%" -m pip install -r requirements\build.txt
 if errorlevel 1 goto fail
 
+REM A suite cientifica (tests\) fica fora do repositorio; roda so se existir.
+if not exist tests\test_science.py goto semtestes
 echo ==^> Rodando a suite cientifica ^(rede de seguranca^)...
 "%PYTHON%" tests\test_science.py
 if errorlevel 1 (
     echo ERRO: test_science.py falhou - build abortado.
     goto fail
 )
+:semtestes
 
 if "%ONEFILE%"=="1" (
     set "PEPTMASS_ONEFILE=1"

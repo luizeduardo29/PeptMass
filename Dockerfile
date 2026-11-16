@@ -5,10 +5,20 @@
 #   docker build -t peptmass:1.0 .
 #   docker compose up -d          # http://localhost:8010
 #
-# Sem ThermoRawFileParser: o .exe e' Windows/.NET. No container le-se
-# mzML/mzXML; converta o .raw antes (ThermoRawFileParser ou msconvert).
+# Le .mzML, .mzXML e .raw da Thermo. O ThermoRawFileParser vem pronto da
+# imagem oficial do Bioconda (so existe para amd64; em Mac M1 o Docker Desktop
+# roda a imagem pelo Rosetta, ver docker-compose.yml) e roda no mono do Debian.
 
-FROM python:3.12-slim
+FROM quay.io/biocontainers/thermorawfileparser:1.4.5--h05cac1d_1 AS trfp
+
+FROM python:3.12-slim-bookworm
+
+# mono-devel traz as fachadas .NET (netstandard.dll) que o conversor exige.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends mono-runtime mono-devel \
+    && rm -rf /var/lib/apt/lists/*
+COPY --from=trfp /usr/local/bin/*.dll /usr/local/bin/*.exe /usr/local/bin/*.config \
+     /usr/local/bin/LICENSE /usr/local/bin/THERMO_LICENSE /opt/trfp/
 
 WORKDIR /app
 
@@ -23,7 +33,8 @@ RUN useradd -m -u 1000 peptmass \
     && mkdir -p /data && chown peptmass:peptmass /data
 USER peptmass
 
-ENV PEPTMASS_DATA_DIR=/data \
+ENV PEPTMASS_THERMO_PARSER=/opt/trfp/ThermoRawFileParser.exe \
+    PEPTMASS_DATA_DIR=/data \
     PEPTMASS_HOST=0.0.0.0 \
     PEPTMASS_PORT=8010 \
     PYTHONUNBUFFERED=1

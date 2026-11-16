@@ -1,9 +1,20 @@
-# PeptMass web. Uma replica so': os arquivos de MS abertos ficam em memoria.
+# PeptMass web. Uma replica so' por instancia: os arquivos de MS abertos ficam
+# em memoria.
+#
+# O nome do projeto (e por isso o do volume com o banco) nao depende do nome
+# da pasta: e' sempre "peptmass", salvo PEPTMASS_INSTANCIA. Para rodar uma
+# segunda instancia, com banco proprio, em outra porta:
+#
+#   PEPTMASS_INSTANCIA=peptmass2 PORTA_HOST=8011 docker compose up -d
+name: "${PEPTMASS_INSTANCIA:-peptmass}"
+
 services:
   peptmass:
     build: .
+    # O ThermoRawFileParser so existe para amd64. Em Mac M1 ou mais novo o
+    # Docker Desktop roda esta imagem pelo Rosetta.
+    platform: linux/amd64
     image: "peptmass:${TAG:-1.0}"
-    container_name: peptmass
     restart: unless-stopped
     mem_limit: "${MEM_LIMIT:-2g}"
     ports:
@@ -13,7 +24,7 @@ services:
       PEPTMASS_MAX_UPLOAD_MB: "${PEPTMASS_MAX_UPLOAD_MB:-4096}"
     volumes:
       # Banco (peptideos salvos, residuos e modificacoes) e envios temporarios.
-      - peptmass_dados:/data
+      - dados:/data
 
 volumes:
-  peptmass_dados:
+  dados:

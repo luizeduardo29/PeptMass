@@ -134,7 +134,9 @@ def _build_compound(query, props):
 def search_by_name(name: str) -> PubChemCompound:
     """Busca um composto pelo nome (ex.: 'ornithine', 'L-citrulline')."""
     q = urllib.parse.quote(name.strip())
-    url = f"{BASE}/compound/name/{q}/property/{_PROPS},CID/JSON"
+    # o CID ja vem em toda resposta; pedi-lo na lista de propriedades hoje
+    # faz o PubChem responder 400 (Invalid property)
+    url = f"{BASE}/compound/name/{q}/property/{_PROPS}/JSON"
     data = _get_json(url)
     props_list = data.get("PropertyTable", {}).get("Properties", [])
     if not props_list:
@@ -144,7 +146,7 @@ def search_by_name(name: str) -> PubChemCompound:
 
 def search_by_cid(cid: int) -> PubChemCompound:
     """Busca um composto pelo CID."""
-    url = f"{BASE}/compound/cid/{int(cid)}/property/{_PROPS},CID/JSON"
+    url = f"{BASE}/compound/cid/{int(cid)}/property/{_PROPS}/JSON"
     data = _get_json(url)
     props_list = data.get("PropertyTable", {}).get("Properties", [])
     if not props_list:

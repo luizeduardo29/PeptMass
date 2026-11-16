@@ -585,6 +585,9 @@ table.tabela-simples td.destaque a:hover { color: var(--marca-escuro); }
 .janela-rodape { border-top: 1px solid var(--borda); justify-content: flex-end; }
 .janela-corpo { padding: 18px 22px; display: grid; gap: 14px; }
 .janela-corpo .campo > span { margin-bottom: 5px; }
+.licenca { margin: 0; max-height: 46vh; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere;
+           font-family: var(--mono); font-size: 12px; line-height: 1.5; color: var(--texto-suave);
+           background: var(--superficie-alt); border: 1px solid var(--borda); border-radius: var(--raio); padding: 12px 14px; }
 .previa { font-family: var(--mono); font-size: 13px; color: var(--marca-texto); background: var(--marca-suave); padding: 8px 12px; border-radius: var(--raio); }
 .pubchem-corpo { display: grid; grid-template-columns: 180px 1fr; gap: 16px; align-items: start; }
 .pubchem-img { width: 180px; height: 180px; border: 1px solid var(--borda); border-radius: var(--raio); background: #fff; display: grid; place-items: center; overflow: hidden; }

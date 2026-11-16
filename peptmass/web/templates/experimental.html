@@ -14,13 +14,19 @@
 
 <section class="card">
   <h2><span class="numero">1</span>{{ _('ms.file.title') }}</h2>
-  <form id="ms-form" class="row" data-exemplo="{{ url_for('static', filename='exemplos/exemplo_PEPTIDE.mzML') }}">
+  <form id="ms-form" class="row" data-max-mb="{{ (config.MAX_CONTENT_LENGTH // 1048576) if config.MAX_CONTENT_LENGTH else '' }}" data-exemplo="{{ url_for('static', filename='exemplos/exemplo_PEPTIDE.mzML') }}">
     <label class="campo cresce"><span>{{ _('ms.file.label') }}</span><input type="file" id="ms-arquivo" accept=".mzML,.mzml,.mzXML,.mzxml,.raw"></label>
     <label class="marca simples" style="margin-bottom:10px" title="{{ _('ms.file.profile_help') }}"><input type="checkbox" id="ms-perfil">{{ _('ms.file.profile') }}</label>
     <button type="submit" id="ms-abrir"><svg class="icone" aria-hidden="true"><use href="#i-enviar"/></svg>{{ _('ms.file.open') }}</button>
   </form>
   <div class="progress" id="ms-progresso" style="margin-top:12px" hidden><i></i></div>
   <div class="estado" id="ms-estado">{{ _('ms.file.none') }}</div>
+  {# So no executavel e sem o conversor: o usuario baixa o leitor de .raw. #}
+  <div class="notice warn row centro" id="ms-leitor" style="margin-top:12px" hidden>
+    <span class="cresce" style="flex:1 1 260px">{{ _('ms.reader.missing') }}</span>
+    <button type="button" class="pequeno" id="ms-leitor-instalar"><svg class="icone" aria-hidden="true"><use href="#i-baixar"/></svg>{{ _('ms.reader.install') }}</button>
+  </div>
+  <div class="estado" id="ms-leitor-estado" hidden></div>
   <div class="row" id="ms-selecao" style="margin-top:6px" hidden>
     <label class="campo medio"><span>{{ _('ms.level') }}</span><select id="ms-nivel"></select></label>
     <label class="campo cresce"><span>{{ _('ms.filter') }}</span><select id="ms-filtro"></select></label>
@@ -106,6 +112,21 @@
     </table>
   </div>
 </section>
+
+{# Licenca da Thermo que veio no pacote baixado: so instala se o usuario aceitar. #}
+<dialog class="janela larga" id="dlg-leitor">
+  <form method="dialog">
+    <div class="janela-topo"><h2>{{ _('ms.reader.license_title') }}</h2></div>
+    <div class="janela-corpo">
+      <p class="hint" style="margin:0">{{ _('ms.reader.license_intro') }}</p>
+      <pre class="licenca" id="leitor-licenca"></pre>
+    </div>
+    <div class="janela-rodape">
+      <button type="button" class="ghost" id="leitor-recusar">{{ _('ms.reader.decline') }}</button>
+      <button type="button" id="leitor-aceitar">{{ _('ms.reader.accept') }}</button>
+    </div>
+  </form>
+</dialog>
 {% endblock %}
 
 {% block scripts %}

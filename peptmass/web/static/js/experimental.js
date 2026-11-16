@@ -69,6 +69,13 @@
   }
 
   function openFile(file) {
+    /* Acima do limite do servidor: avisa aqui, sem enviar o arquivo */
+    var maxMb = parseInt($("ms-form").getAttribute("data-max-mb"), 10);
+    if (maxMb && file.size > maxMb * 1048576) {
+      PM.setState(status, "✗ " + T("ms.file.too_large",
+        { f: file.name, size: Math.ceil(file.size / 1048576), max: maxMb }), "bad");
+      return;
+    }
     var form = new FormData();
     form.append("file", file);
     form.append("profile", $("ms-perfil").checked ? "1" : "0");
@@ -90,6 +97,49 @@
       loadFilters();
     });
   }
+
+  /* ---------------------------------------------- leitor de .raw (executavel) */
+  /* O executavel nao traz o ThermoRawFileParser (licenca da Thermo). Aqui o
+     usuario o baixa do repositorio oficial, le a licenca e so entao instala. */
+  var reader = $("ms-leitor"), readerState = $("ms-leitor-estado"), readerDlg = $("dlg-leitor");
+  function readerMsg(text, kind) {
+    readerState.hidden = !text;
+    PM.setState(readerState, text, kind);
+  }
+  function checkReader() {
+    PM.api("/api/raw-reader").then(function (res) {
+      reader.hidden = !(res.ok && res.installable);
+    });
+  }
+  $("ms-leitor-instalar").addEventListener("click", function () {
+    var btn = this;
+    btn.disabled = true;
+    readerMsg(T("ms.reader.downloading"));
+    PM.api("/api/raw-reader/download", { body: {} }).then(function (res) {
+      btn.disabled = false;
+      if (!res.ok) { readerMsg("✗ " + res.error, "bad"); return; }
+      readerMsg("");
+      $("leitor-licenca").textContent = res.thermo_license +
+        (res.license ? "\n\n────────────────\n\nThermoRawFileParser\n\n" + res.license : "");
+      $("leitor-licenca").scrollTop = 0;
+      readerDlg.showModal();
+    });
+  });
+  $("leitor-aceitar").addEventListener("click", function () {
+    readerDlg.close();
+    PM.api("/api/raw-reader/accept", { body: {} }).then(function (res) {
+      if (!res.ok) { readerMsg("✗ " + res.error, "bad"); return; }
+      reader.hidden = true;
+      readerMsg("✓ " + T("ms.reader.installed"), "ok");
+    });
+  });
+  function declineReader() {
+    PM.api("/api/raw-reader/cancel", { body: {} });
+    readerMsg(T("ms.reader.cancelled"), "warn");
+  }
+  $("leitor-recusar").addEventListener("click", function () { readerDlg.close(); declineReader(); });
+  readerDlg.addEventListener("cancel", declineReader);   // tecla Esc
+  checkReader();
 
   function loadFilters() {
     if (!runId) return;

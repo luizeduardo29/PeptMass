@@ -28,38 +28,45 @@ ONEFILE = os.environ.get("PEPTMASS_ONEFILE") == "1"
 ROOT = os.path.dirname(SPECPATH)  # SPECPATH: pasta deste .spec (PyInstaller)
 
 # ---------------------------------------------------------------------------
-# Coleta de dependências que precisam de dados/submódulos além do .py
-#   - matplotlib: dados (fontes, mpl-data) + backend QtAgg
+# O executavel abre a interface web (peptmass/web) numa janela propria
+# (PyQt6-WebEngine), entao leva junto as telas, traducoes e arquivos
+# estaticos do site.
 #   - reportlab : fontes embutidas e arquivos de dados para PDF
-# PyQt6 e openpyxl são tratados pelos hooks nativos do PyInstaller.
+#   - pyteomics/psims: leitura de mzML/mzXML
+# PyQt6, PyQt6-WebEngine e openpyxl sao tratados pelos hooks do PyInstaller.
+#
+# O ThermoRawFileParser NAO vai no pacote: a licenca da biblioteca da Thermo
+# restringe distribui-la junto com software GPL. Se a pessoa o instalar, o
+# PeptMass o encontra (PEPTMASS_THERMO_PARSER, PATH) e abre .raw.
 # ---------------------------------------------------------------------------
 datas = []
 binaries = []
-hiddenimports = [
-    "matplotlib.backends.backend_qtagg",
-    "PyQt6.QtPrintSupport",  # usado pelo backend Qt de impressão/exportação
-]
+hiddenimports = ["waitress"]
 
-for pkg in ("matplotlib", "reportlab", "pyteomics", "psims"):
+for pkg in ("reportlab", "pyteomics", "psims"):
     try:
         pkg_datas, pkg_binaries, pkg_hidden = collect_all(pkg)
     except Exception:
-        continue  # pacote opcional ausente: a aba experimental fica desativada
+        continue
     datas += pkg_datas
     binaries += pkg_binaries
     hiddenimports += pkg_hidden
 
-# Bundle opcional do ThermoRawFileParser (para abrir .raw direto), se a pasta
-# 'ThermoRawFileParser/' existir na raiz do projeto.
-_trfp = os.path.join(ROOT, "ThermoRawFileParser")
-if os.path.isdir(_trfp):
-    datas += [(_trfp, "ThermoRawFileParser")]
+_web = os.path.join(ROOT, "peptmass", "web")
+datas += [
+    (os.path.join(_web, "templates"), os.path.join("peptmass", "web", "templates")),
+    (os.path.join(_web, "static"), os.path.join("peptmass", "web", "static")),
+    (os.path.join(_web, "locales"), os.path.join("peptmass", "web", "locales")),
+    # icone da janela (mesmo mascote do site)
+    (os.path.join(ROOT, "peptmass", "desktop", "assets"),
+     os.path.join("peptmass", "desktop", "assets")),
+]
 
 # ---------------------------------------------------------------------------
-# Ícone opcional
+# Ícone do executável
 # ---------------------------------------------------------------------------
 if sys.platform.startswith("win"):
-    _icon_path = os.path.join(ROOT, "peptmass.ico")
+    _icon_path = os.path.join(SPECPATH, "peptmass.ico")
 elif sys.platform == "darwin":
     _icon_path = os.path.join(ROOT, "peptmass.icns")
 else:
@@ -76,10 +83,25 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    # Evita conflito de múltiplos bindings Qt (causa comum de falha com matplotlib)
-    excludes=["PyQt5", "PySide6", "PySide2", "tkinter", "test", "pytest"],
+    # Evita conflito de múltiplos bindings Qt; matplotlib nao e usado pela
+    # interface web (os graficos sao Plotly, no navegador embutido)
+    excludes=["PyQt5", "PySide6", "PySide2", "tkinter", "test", "pytest",
+              "matplotlib"],
     noarchive=False,
 )
+
+# Modulos QML/Quick do Qt nao sao usados (a janela e QtWidgets + WebEngine):
+# tira-los encurta os caminhos (limite de 260 caracteres do Windows) e o pacote.
+# As ferramentas de desenvolvedor do navegador embutido (~80 MB) tambem nao.
+def _sem_qml(entries):
+    return [e for e in entries
+            if "/qml/" not in e[0].replace("\\", "/")
+            and "/qml/" not in str(e[1]).replace("\\", "/")
+            and "qtwebengine_devtools_resources" not in e[0]]
+
+
+a.datas = _sem_qml(a.datas)
+a.binaries = _sem_qml(a.binaries)
 
 pyz = PYZ(a.pure)
 

@@ -35,8 +35,11 @@ echo "==> Instalando dependencias..."
 "$PYTHON" -m pip install --upgrade pip
 "$PYTHON" -m pip install -r requirements/build.txt
 
-echo "==> Rodando a suite cientifica (rede de seguranca)..."
-"$PYTHON" tests/test_science.py
+# A suite cientifica (tests/) fica fora do repositorio; roda so se existir.
+if [ -f tests/test_science.py ]; then
+  echo "==> Rodando a suite cientifica (rede de seguranca)..."
+  "$PYTHON" tests/test_science.py
+fi
 
 if [ "$ONEFILE" -eq 1 ]; then
   export PEPTMASS_ONEFILE=1

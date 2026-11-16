@@ -272,17 +272,23 @@ class MzxmlRun(_PyteomicsRun):
 def find_thermo_parser():
     """Localiza o ThermoRawFileParser. Ordem de busca:
     1) variável de ambiente PEPTMASS_THERMO_PARSER (caminho do exe);
-    2) pasta 'ThermoRawFileParser' no bundle (exe PyInstaller) ou na raiz
-       do projeto (execução por código);
-    3) no PATH (ThermoRawFileParser.exe / ThermoRawFileParser)."""
+    2) pasta 'ThermoRawFileParser' ao lado do PeptMass.exe, no bundle, na
+       raiz do projeto (execução por código) ou em ~/.peptmass;
+    3) no PATH (ThermoRawFileParser.exe / ThermoRawFileParser).
+    O conversor não vai no executável: a licença da biblioteca da Thermo
+    restringe distribuí-la junto com software GPL."""
     env = os.environ.get("PEPTMASS_THERMO_PARSER")
     if env and os.path.exists(env):
         return env
     bases = []
-    # exe congelado (PyInstaller): dados ficam em sys._MEIPASS
-    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
-        bases.append(sys._MEIPASS)
+    # exe congelado (PyInstaller): ao lado do PeptMass.exe (onde o usuario
+    # coloca a pasta) e os dados do pacote em sys._MEIPASS
+    if getattr(sys, "frozen", False):
+        bases.append(os.path.dirname(sys.executable))
+        if hasattr(sys, "_MEIPASS"):
+            bases.append(sys._MEIPASS)
     bases.append(_PROJECT_ROOT)
+    bases.append(os.path.join(os.path.expanduser("~"), ".peptmass"))
     for base in bases:
         for name in ("ThermoRawFileParser.exe", "ThermoRawFileParser"):
             cand = os.path.join(base, "ThermoRawFileParser", name)
@@ -300,10 +306,12 @@ def thermo_raw_to_mzml(raw_path, out_dir=None, no_peak_picking=False):
     Por padrão o conversor faz peak picking (saída centroidada)."""
     exe = find_thermo_parser()
     if not exe:
-        raise SpectraIOError(
-            "ThermoRawFileParser não encontrado. Converta o .raw para mzML "
-            "antes de abrir, ou defina PEPTMASS_THERMO_PARSER com o caminho do "
-            "conversor.")
+        from peptmass.core.i18n import t as _
+        raise SpectraIOError(_(
+            "Para abrir .raw é preciso o leitor ThermoRawFileParser, que não vem "
+            "com o PeptMass. No programa para Windows, use o botão \"Instalar "
+            "leitor de .raw\" desta tela. Outra opção: converta o .raw para "
+            "mzML e abra o mzML."))
     out_dir = out_dir or tempfile.mkdtemp(prefix="peptmass_raw_")
     cmd = [exe, "-i", raw_path, "-o", out_dir, "-f", "2"]  # -f 2 = mzML indexado
     if no_peak_picking:
@@ -324,17 +332,20 @@ def thermo_raw_to_mzml(raw_path, out_dir=None, no_peak_picking=False):
 
 
 # ---------------------------------------------------------------------------
-def open_run(path, profile=False):
+def open_run(path, profile=False, work_dir=None):
     """Abre um arquivo de dados e devolve um MSRun.
 
     Suporta .mzML, .mzXML e .raw (este último convertido para mzML).
-    profile=True converte o .raw sem peak picking (dados em perfil)."""
+    profile=True converte o .raw sem peak picking (dados em perfil).
+    work_dir: pasta onde o mzML convertido de um .raw é gravado (quem chama
+    a apaga quando fecha o arquivo); sem ela, uma pasta temporária nova."""
     ext = os.path.splitext(path)[1].lower()
     if ext == ".mzml":
         return MzmlRun(path)
     if ext == ".mzxml":
         return MzxmlRun(path)
     if ext == ".raw":
-        return MzmlRun(thermo_raw_to_mzml(path, no_peak_picking=profile))
+        return MzmlRun(thermo_raw_to_mzml(path, out_dir=work_dir,
+                                          no_peak_picking=profile))
     raise SpectraIOError(f"Formato não suportado: '{ext}'. "
                          f"Use .mzML, .mzXML ou .raw.")

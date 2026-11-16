@@ -2,49 +2,268 @@
 
 **Calculadora de massas moleculares e fragmentação MS/MS de peptídeos e proteínas**
 
-Software desktop em Python + PyQt6 para cálculo de massas exatas, estados de
-carga, séries teóricas de fragmentação MS/MS, modificações químicas e
-aminoácidos não-naturais — com interface moderna e tema claro/escuro.
+Software em Python para cálculo de massas exatas, estados de carga, séries
+teóricas de fragmentação MS/MS, modificações químicas, aminoácidos
+não-naturais e anotação de espectros experimentais (`.mzML`, `.mzXML` e `.raw`
+da Thermo), com tema claro/escuro e interface em português, inglês e espanhol.
+
+Licença: [GPL-3.0](LICENSE).
 
 ---
 
-## Instalação
+## Como usar: escolha uma das três formas
 
-Requer **Python 3.10+**.
+As três formas têm **as mesmas telas e as mesmas funções**. Escolha a mais
+simples para o seu caso:
+
+| Forma | Sistema | Precisa instalar | Para quem |
+|---|---|---|---|
+| [**1. Programa para Windows (.exe)**](#1-programa-para-windows-exe) | Windows 10 ou 11 (64 bits) | Nada | Quem só quer usar o programa |
+| [**2. Docker**](#2-docker-windows-macos-e-linux) | Windows, macOS (inclusive M1 ou mais novo) e Linux | Docker | macOS e Linux, ou um servidor para a equipe na rede |
+| [**3. Python (código-fonte)**](#3-python-código-fonte) | Qualquer um com Python 3.10+ | Python | Quem vai estudar ou alterar o código |
+
+---
+
+## 1. Programa para Windows (.exe)
+
+Não precisa de Python nem de nenhuma outra instalação.
+
+1. Na página do projeto no GitHub, abra **Releases** (à direita) e baixe o
+   arquivo `PeptMass-<versão>-Windows.zip` (cerca de 220 MB).
+2. Clique com o botão direito no `.zip` → **Extrair tudo…** e escolha uma
+   pasta (por exemplo, `Documentos\PeptMass`). Não abra o programa de dentro do
+   `.zip`: extraia antes.
+3. Na pasta extraída, abra **`PeptMass\PeptMass.exe`** (duplo clique). A
+   janela do PeptMass abre em alguns segundos.
+
+> **Aviso "O Windows protegeu o computador".** Na primeira vez, o Windows
+> pode mostrar essa tela azul (SmartScreen), porque o programa ainda não tem
+> assinatura digital de uma empresa. Para abrir:
+> clique em **Mais informações** → **Executar assim mesmo**. O aviso não volta
+> nas próximas vezes. Se o antivírus da instituição bloquear o programa, peça
+> ao suporte de TI para liberar a pasta do PeptMass.
+
+**Mantenha a pasta inteira.** O `PeptMass.exe` precisa da pasta `_internal`
+que está ao lado dele. Para levar o programa a outro computador, copie a pasta
+`PeptMass` inteira. Para criar um atalho, clique com o botão direito no
+`PeptMass.exe` → **Mostrar mais opções** → **Enviar para** → **Área de
+trabalho (criar atalho)**.
+
+**Abrir arquivos `.raw` da Thermo.** O programa não traz o leitor de `.raw`
+(ThermoRawFileParser), porque a licença da biblioteca da Thermo não permite
+distribuí-lo junto com o PeptMass. Para instalar, uma única vez:
+
+1. Abra a tela **Dados experimentais**.
+2. Clique em **Instalar leitor de .raw** (precisa de internet).
+3. Leia a licença da Thermo que aparece e clique em **Aceito e instalar**.
+
+O PeptMass baixa a versão oficial do
+[ThermoRawFileParser](https://github.com/compomics/ThermoRawFileParser), confere
+que o arquivo é o original (SHA-256) e só instala se você aceitar. Se recusar,
+nada fica no computador. Arquivos `.mzML` e `.mzXML` abrem sem o leitor.
+
+**Onde ficam os dados.** Peptídeos salvos, aminoácidos e modificações
+cadastrados ficam em `C:\Users\<seu usuário>\.peptmass\peptmass.db`, junto com
+o leitor de `.raw` (se instalado). Atualizar o programa (baixar um `.zip` novo)
+não apaga esses dados.
+
+**Atualizar.** Baixe o `.zip` da nova versão em Releases, extraia e use a nova
+pasta. A pasta antiga pode ser apagada.
+
+**Desinstalar.** Apague a pasta do programa. Para apagar também os dados,
+apague a pasta `C:\Users\<seu usuário>\.peptmass`.
+
+---
+
+## 2. Docker (Windows, macOS e Linux)
+
+O Docker roda o PeptMass num "container" e você usa o programa pelo navegador.
+O container **já traz o leitor de `.raw`**: não é preciso instalar mais nada.
+
+### 2.1 Instalar o Docker (uma vez)
+
+- **Windows e macOS:** instale o
+  [Docker Desktop](https://www.docker.com/products/docker-desktop/) e abra-o.
+  Espere o ícone da baleia indicar que o Docker está rodando. No Windows, o
+  instalador pode pedir para ativar o WSL 2 e reiniciar o computador.
+- **Mac com chip Apple (M1 ou mais novo):** o leitor de `.raw` só existe para
+  processadores Intel/AMD (amd64), então o Docker Desktop roda o PeptMass pela
+  emulação Rosetta. Se o Docker pedir, aceite instalar o Rosetta; em
+  **Settings → General**, deixe marcada a opção *Use Rosetta for x86_64/amd64
+  emulation on Apple Silicon*.
+- **Linux:** instale o [Docker Engine](https://docs.docker.com/engine/install/)
+  com o plugin `docker compose`. Para não precisar de `sudo`:
+  `sudo usermod -aG docker $USER` e entre de novo na sessão.
+
+Para conferir, abra um terminal (no Windows, o **PowerShell**) e rode:
+
+```bash
+docker compose version
+```
+
+### 2.2 Baixar o PeptMass
+
+Com git:
+
+```bash
+git clone https://github.com/luizeduardo29/PeptMass.git
+cd PeptMass
+```
+
+Sem git: na página do projeto no GitHub, clique em **Code → Download ZIP**,
+extraia o `.zip` e abra o terminal dentro da pasta extraída (a que tem o
+arquivo `docker-compose.yml`).
+
+### 2.3 Subir o PeptMass
+
+Dentro da pasta do projeto:
+
+```bash
+docker compose up -d --build
+```
+
+A primeira vez demora alguns minutos (baixa e monta a imagem, cerca de 900 MB).
+Depois, abra no navegador: **<http://localhost:8010>**
+
+O container fica rodando em segundo plano e volta sozinho quando o Docker
+reinicia (por exemplo, depois de religar o computador).
+
+### 2.4 Comandos do dia a dia
+
+Rode todos dentro da pasta do projeto.
+
+| Para | Comando |
+|---|---|
+| Ver se está rodando | `docker compose ps` |
+| Parar (os dados ficam guardados) | `docker compose stop` |
+| Iniciar de novo | `docker compose start` |
+| Ver o registro (log) | `docker compose logs -f` (Ctrl+C sai) |
+| Atualizar para a versão nova | `git pull` (ou baixe o ZIP novo) e depois `docker compose up -d --build` |
+| Remover o container (os dados ficam) | `docker compose down` |
+| Remover o container **e apagar os dados** | `docker compose down -v` |
+| Copiar o banco para a pasta atual (backup) | `docker compose cp peptmass:/data/peptmass.db ./peptmass.db` |
+
+### 2.5 Ajustes
+
+As opções vão antes do comando (Linux e macOS) ou num arquivo `.env` na pasta
+do projeto (qualquer sistema, inclusive Windows), uma por linha, por exemplo
+`PORTA_HOST=8020`.
+
+| Variável | Padrão | O que faz |
+|---|---|---|
+| `PORTA_HOST` | `8010` | Porta no computador. Use outra se a 8010 estiver ocupada. |
+| `PEPTMASS_MAX_UPLOAD_MB` | `4096` | Tamanho máximo de arquivo de MS enviado, em MB. |
+| `MEM_LIMIT` | `2g` | Memória máxima do container. Aumente para arquivos `.raw` grandes em perfil. |
+| `PEPTMASS_INSTANCIA` | `peptmass` | Nome da instância (e do volume com os dados). |
+
+Exemplo (Linux/macOS): `PORTA_HOST=8020 docker compose up -d`.
+
+**Usar de outros computadores da rede.** O container aceita conexões da rede:
+os colegas abrem `http://<IP do seu computador>:8010`. No Windows, pode ser
+preciso liberar a porta 8010 no Firewall do Windows. O PeptMass **não tem
+login**: deixe-o acessível só na rede interna, nunca direto na internet.
+
+**Rodar duas instâncias** (por exemplo, uma por equipe, cada uma com seu
+próprio banco): dê outro nome e outra porta à segunda.
+
+```bash
+PEPTMASS_INSTANCIA=peptmass2 PORTA_HOST=8011 docker compose up -d
+```
+
+No Windows (PowerShell):
+
+```powershell
+$env:PEPTMASS_INSTANCIA="peptmass2"; $env:PORTA_HOST="8011"; docker compose up -d
+```
+
+Para parar ou atualizar essa segunda instância, use o mesmo
+`PEPTMASS_INSTANCIA` nos comandos.
+
+**Onde ficam os dados.** No volume do Docker `peptmass_dados` (ou
+`<instância>_dados`). Ele sobrevive a `stop`, `down`, atualizações e
+reinícios; só `docker compose down -v` o apaga. Os arquivos de MS enviados são
+temporários: saem do disco quando o arquivo é fechado (o PeptMass mantém até 3
+abertos) e quando o container reinicia.
+
+---
+
+## 3. Python (código-fonte)
+
+Requer **Python 3.10 ou mais novo**
+([python.org](https://www.python.org/downloads/); no Windows, marque *Add
+python.exe to PATH* na instalação).
+
+```bash
+git clone https://github.com/luizeduardo29/PeptMass.git
+cd PeptMass
+python -m venv .venv
+# Windows:      .venv\Scripts\activate
+# Linux/macOS:  source .venv/bin/activate
+```
+
+**No navegador** (a mesma versão do container):
+
+```bash
+pip install -r requirements/web.txt
+python run_web.py                         # http://127.0.0.1:8010, só neste computador
+python run_web.py --host 0.0.0.0          # também para a rede (sem login: só rede interna)
+python run_web.py --port 8020             # outra porta
+```
+
+**Numa janela própria** (o mesmo programa do `.exe`):
 
 ```bash
 pip install -r requirements/desktop.txt
 python run_desktop.py
 ```
 
-No Windows, `scripts\run_desktop.bat` cria a venv e abre o programa.
+No Windows, `scripts\run_desktop.bat` faz tudo isso com um duplo clique: na
+primeira vez cria a `.venv` e instala as dependências.
+
+Variáveis de ambiente:
+
+| Variável | Padrão | O que faz |
+|---|---|---|
+| `PEPTMASS_HOST` / `PEPTMASS_PORT` | `127.0.0.1` / `8010` | Endereço do `run_web.py` (o mesmo que `--host` / `--port`). |
+| `PEPTMASS_DATA_DIR` | `~/.peptmass` | Pasta do banco e dos envios temporários. |
+| `PEPTMASS_MAX_UPLOAD_MB` | `4096` | Tamanho máximo de arquivo de MS enviado, em MB. |
+| `PEPTMASS_THERMO_PARSER` | — | Caminho do `ThermoRawFileParser.exe`, para abrir `.raw`. |
+
+Para abrir `.raw` rodando pelo Python, instale o
+[ThermoRawFileParser](https://github.com/compomics/ThermoRawFileParser) e
+coloque a pasta `ThermoRawFileParser/` na raiz do projeto ou em `~/.peptmass/`,
+ou aponte `PEPTMASS_THERMO_PARSER`. No Windows basta o .NET Framework (já vem
+no Windows 10/11); no Linux e no macOS é preciso o `mono`. O botão **Instalar
+leitor de .raw** aparece apenas no programa para Windows (`run_desktop.py` /
+`.exe`).
 
 ---
 
-## Versão web (Flask)
+## Problemas comuns
 
-O PeptMass também roda no navegador, com o template dos outros módulos da Hub
-(DopinGPT, DopingValidation, DegradationFinder) na cor **verde-limão**: tema claro e
-escuro e idiomas **português, inglês e espanhol** (menu do globo no topo).
-Usa o mesmo núcleo de cálculo e o mesmo banco do desktop.
+| Sintoma | Solução |
+|---|---|
+| "O Windows protegeu o computador" ao abrir o `.exe` | **Mais informações** → **Executar assim mesmo** (ver seção 1). |
+| O `.exe` não abre ou fecha logo | Extraia o `.zip` inteiro antes (não rode de dentro dele) e não separe o `PeptMass.exe` da pasta `_internal`. |
+| "Para abrir .raw é preciso o leitor ThermoRawFileParser…" | No `.exe`: botão **Instalar leitor de .raw** na tela Dados experimentais. Pelo Python: ver seção 3. Ou converta o `.raw` para mzML (msconvert ou ThermoRawFileParser). |
+| Falha ao baixar o leitor de `.raw` | Precisa de internet com acesso ao GitHub. Em redes com bloqueio, tente de outra rede ou peça liberação de `github.com`. |
+| "… passa do limite de envio deste servidor" | Aumente `PEPTMASS_MAX_UPLOAD_MB` (seção 2.5) e suba de novo com `docker compose up -d`. |
+| `.raw` grande em perfil falha no Docker | Aumente `MEM_LIMIT` (por exemplo, `4g`). |
+| `docker compose up` diz que a porta 8010 está ocupada | Use outra porta: `PORTA_HOST=8020` (seção 2.5). |
+| `docker: command not found` / "Cannot connect to the Docker daemon" | Abra o Docker Desktop (Windows/macOS) ou inicie o serviço (`sudo systemctl start docker` no Linux). |
+| Colegas não conseguem abrir pela rede | Use o IP do computador (não `localhost`) e libere a porta no firewall. Pelo Python, suba com `--host 0.0.0.0`. |
+| A busca no PubChem falha | Precisa de internet com acesso a `pubchem.ncbi.nlm.nih.gov`. |
 
-```bash
-pip install -r requirements/web.txt
-python run_web.py            # http://127.0.0.1:8010
-python tests/test_web.py     # verificação da versão web
-```
+---
 
-Em container:
+## Telas
 
-```bash
-docker compose up -d --build # http://localhost:8010 (dados no volume peptmass_dados)
-```
-
-Telas: **Início**, **Massa** (Aba 1), **Fragmentação** (Aba 2), **Dados
-experimentais** (Aba 3) e **Biblioteca** (aminoácidos não-naturais,
-modificações e PubChem). O código fica em `peptmass/web/`, e as traduções em
-`peptmass/web/locales/*.json`. No container, a leitura de `.raw` não está disponível
-(o ThermoRawFileParser é um executável Windows); converta o arquivo para mzML antes.
+**Início**, **Massa** (Aba 1), **Fragmentação** (Aba 2), **Dados
+experimentais** (Aba 3), **Biblioteca** (aminoácidos não-naturais,
+modificações e PubChem) e **Como usar** (demonstrações interativas). A tela
+Como usar abre um arquivo de exemplo
+(`peptmass/web/static/exemplos/exemplo_PEPTIDE.mzML`) para experimentar a Aba 3
+sem dados próprios.
 
 ---
 
@@ -73,10 +292,8 @@ peptmass/
     __init__.py         create_app
     blueprints/         pages.py (telas) e api/ (mass, fragments, library, spectra)
     templates/  static/  locales/
-  desktop/          PyQt6
-    main_window.py      janela principal
-    mass_tab.py, fragment_tab.py, experimental_tab.py
-tests/              test_science.py, test_web.py, data/
+  desktop/          janela do executável
+    app.py              servidor interno + interface web num QWebEngineView
 packaging/          PyInstaller (peptmass.spec, build.bat, build.sh)
 scripts/            atalhos do desktop no Windows
 requirements/       desktop.txt, web.txt, build.txt
@@ -194,25 +411,31 @@ arquivo de dados:
    - **Carga do precursor**: lida do arquivo ou **estimada automaticamente**
      pelo espaçamento do cluster isotópico (deconvolução).
 
-Requer `pyteomics`, `psims` e `lxml` (já em `requirements/`). Para abrir
-`.raw` diretamente é preciso o **ThermoRawFileParser**: aponte-o pela variável
-de ambiente `PEPTMASS_THERMO_PARSER` (caminho do executável) ou coloque a pasta
-`ThermoRawFileParser/` na raiz do projeto. Sem ele, converta o `.raw` para mzML
-antes (ThermoRawFileParser ou msconvert).
+A leitura usa `pyteomics`, `psims` e `lxml` (já em `requirements/`). O `.raw`
+é convertido para mzML pelo **ThermoRawFileParser** 1.4.5. O container já o
+traz (imagem oficial do Bioconda). O executável do Windows **não** o traz,
+porque a licença da biblioteca da Thermo (RawFileReader) restringe
+distribuí-la junto com software GPL: o próprio usuário o obtém pelo botão
+**Instalar leitor de .raw**, que baixa o pacote oficial
+([github.com/compomics/ThermoRawFileParser](https://github.com/compomics/ThermoRawFileParser)),
+confere o SHA-256, mostra a licença da Thermo e só instala (em
+`~/.peptmass/ThermoRawFileParser/`) se ele aceitar. O PeptMass procura o
+conversor, nesta ordem, em `PEPTMASS_THERMO_PARSER`, numa pasta
+`ThermoRawFileParser/` ao lado do `PeptMass.exe`, na raiz do projeto, em
+`~/.peptmass/` e no `PATH`. O mzML convertido fica na pasta do envio e é
+apagado quando o arquivo é fechado.
 
-Há um arquivo de exemplo `peptmass/web/static/exemplos/exemplo_PEPTIDE.mzML` (sintético,
-com os íons b/y do peptídeo PEPTIDE) para experimentar a aba sem dados próprios. Na web,
-a tela **Como usar** abre esse exemplo direto na tela de Dados experimentais.
+O arquivo de exemplo `peptmass/web/static/exemplos/exemplo_PEPTIDE.mzML` é
+sintético, com os íons b/y do peptídeo PEPTIDE.
 
 ---
 
 ## Validação científica
 
-`python tests/test_science.py` compara os cálculos com valores publicados
-(PEPTIDE, bradicinina, angiotensina II, substância P, séries de fragmentos,
-modificações) e confere os limites dos critérios de identificação. Os 19 testes
-de referência passam dentro de tolerância de ±0.001 Da, e os 12 de critérios
-também passam.
+Os cálculos foram conferidos contra valores publicados (PEPTIDE, bradicinina,
+angiotensina II, substância P, séries de fragmentos, modificações), dentro de
+±0.001 Da, e os limites dos critérios de identificação também foram
+verificados.
 
 Padrões usados:
 - Massas monoisotópicas IUPAC.
@@ -224,20 +447,25 @@ Padrões usados:
 
 ## Interface
 
-- Tema **claro** e **escuro** (alternável na barra de ferramentas).
-- Tabelas ordenáveis e com cópia para a área de transferência
-  (clique direito ou Ctrl+C na seleção).
+- Tema **claro** e **escuro** e idiomas português, inglês e espanhol (menu do
+  globo no topo).
+- Tabelas ordenáveis e com botão de copiar.
 - Atualização automática dos cálculos enquanto se digita.
-- **Gráficos interativos** (espectro MS/MS e envelope isotópico): passe o mouse
-  sobre os picos para ver íon, carga, m/z e subsequência; barra de navegação
-  com zoom, pan, reset e exportar imagem.
+- **Gráficos interativos** (Plotly): passe o mouse sobre os picos para ver íon,
+  carga, m/z e subsequência; arraste para dar zoom e clique duas vezes para voltar.
+- Tela **Como usar** com demonstrações interativas.
 
 ---
 
 ## Empacotamento (executável)
 
-O PeptMass pode ser empacotado num executável standalone com **PyInstaller**,
-dispensando que o usuário final tenha Python instalado.
+O `.zip` do Windows publicado em Releases é gerado pelo GitHub Actions
+(`.github/workflows/executaveis.yml`) ao criar uma tag `v*`: empacota com **PyInstaller** e anexa
+`PeptMass-<versão>-Windows.zip` à Release. Para macOS e Linux a forma
+distribuída é o Docker (seção 2); o build local abaixo existe, mas esses
+executáveis não são publicados nem testados.
+
+Para gerar o executável localmente:
 
 ```bash
 pip install -r requirements/build.txt
@@ -267,15 +495,16 @@ pyinstaller packaging/peptmass.spec --noconfirm --clean
 Detalhes:
 
 - A receita está em [`packaging/peptmass.spec`](packaging/peptmass.spec); os
-  scripts `build.bat` e `build.sh` criam uma venv de build isolada, rodam
-  `tests/test_science.py` como rede de segurança e só então empacotam.
+  scripts `build.bat` e `build.sh` criam uma venv de build isolada e empacotam.
 - **onedir** (padrão) é mais confiável e tem startup mais rápido; **onefile**
   (`PEPTMASS_ONEFILE=1`) gera um único arquivo, porém com startup mais lento e
   maior chance de falso-positivo de antivírus no Windows.
-- O `.spec` coleta automaticamente os dados do `matplotlib` (backend QtAgg) e
-  do `reportlab`, e exclui bindings Qt conflitantes (PyQt5/PySide).
-- **Ícone (opcional):** coloque `peptmass.ico` (Windows) ou `peptmass.icns`
-  (macOS) na raiz do projeto antes de empacotar — o `.spec` os detecta sozinho.
+- O `.spec` leva as telas, traduções e arquivos estáticos de `peptmass/web`, o
+  navegador embutido (PyQt6-WebEngine) e os dados do `reportlab`; deixa de fora
+  os módulos QML do Qt e as ferramentas de desenvolvedor do navegador. O pacote
+  Windows fica com ~515 MB (~220 MB zipado).
+- **Ícone:** `packaging/peptmass.ico` (o mascote); no macOS, `peptmass.icns` na
+  raiz do projeto, se existir.
 - O banco local continua em `~/.peptmass/peptmass.db`, criado em runtime — nada
   precisa ser embutido no pacote.
 - O executável deve ser gerado **na plataforma de destino** (PyInstaller não faz
@@ -283,8 +512,8 @@ Detalhes:
 - **Distribuição**: no modo onedir, o resultado é a pasta `dist/PeptMass/`
   (executável + `_internal/`). Para levar a outro computador, **copie/zipe a
   pasta inteira** — o `PeptMass.exe` sozinho não roda. Não precisa de Python
-  instalado no destino. Se a pasta `ThermoRawFileParser/` existir na raiz ao
-  empacotar, ela é embutida e a leitura de `.raw` funciona sem instalar nada.
+  instalado no destino. O ThermoRawFileParser não é embutido; o usuário o
+  instala pelo botão da tela de Dados experimentais (ver Aba 3).
 
 ## Recursos avançados implementados
 

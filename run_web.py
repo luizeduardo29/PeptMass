@@ -41,8 +41,11 @@ def main():
         app.run(host=args.host, port=args.port, threaded=True)
         return
     print(f"PeptMass web em http://{args.host}:{args.port}")
+    # O waitress aceita um pouco mais que o Flask (cabecalhos do multipart):
+    # assim quem recusa um envio grande e' o Flask, com a mensagem traduzida,
+    # e nao o waitress, que derruba a conexao.
     serve(app, host=args.host, port=args.port, threads=8,
-          max_request_body_size=app.config["MAX_CONTENT_LENGTH"])
+          max_request_body_size=app.config["MAX_CONTENT_LENGTH"] + 16 * 1024 * 1024)
 
 
 if __name__ == "__main__":
