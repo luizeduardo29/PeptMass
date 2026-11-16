@@ -1,197 +1,199 @@
 # PeptMass
 
-**Calculadora de massas moleculares e fragmentação MS/MS de peptídeos e proteínas**
+**Molecular mass and MS/MS fragmentation calculator for peptides and proteins**
 
-Software em Python para cálculo de massas exatas, estados de carga, séries
-teóricas de fragmentação MS/MS, modificações químicas, aminoácidos
-não-naturais e anotação de espectros experimentais (`.mzML`, `.mzXML` e `.raw`
-da Thermo), com tema claro/escuro e interface em português, inglês e espanhol.
+Python software for exact masses, charge states, theoretical MS/MS fragment
+series, chemical modifications, non-natural amino acids and annotation of
+experimental spectra (`.mzML`, `.mzXML` and Thermo `.raw`), with light/dark
+themes and an interface in Portuguese, English and Spanish.
 
-Licença: [GPL-3.0](LICENSE).
+License: [GPL-3.0](LICENSE).
 
 ---
 
-## Como usar: escolha uma das três formas
+## How to use: pick one of three ways
 
-As três formas têm **as mesmas telas e as mesmas funções**. Escolha a mais
-simples para o seu caso:
+All three have **the same screens and the same features**. Pick the simplest
+one for your case:
 
-| Forma | Sistema | Precisa instalar | Para quem |
+| Way | System | What to install | For whom |
 |---|---|---|---|
-| [**1. Programa para Windows (.exe)**](#1-programa-para-windows-exe) | Windows 10 ou 11 (64 bits) | Nada | Quem só quer usar o programa |
-| [**2. Docker**](#2-docker-windows-macos-e-linux) | Windows, macOS (inclusive M1 ou mais novo) e Linux | Docker | macOS e Linux, ou um servidor para a equipe na rede |
-| [**3. Python (código-fonte)**](#3-python-código-fonte) | Qualquer um com Python 3.10+ | Python | Quem vai estudar ou alterar o código |
+| [**1. Windows program (.exe)**](#1-windows-program-exe) | Windows 10 or 11 (64-bit) | Nothing | Anyone who just wants to use the program |
+| [**2. Docker**](#2-docker-windows-macos-and-linux) | Windows, macOS (including M1 or newer) and Linux | Docker | macOS and Linux, or a server for a team on the network |
+| [**3. Python (source code)**](#3-python-source-code) | Any system with Python 3.10+ | Python | Anyone who will study or change the code |
 
 ---
 
-## 1. Programa para Windows (.exe)
+## 1. Windows program (.exe)
 
-Não precisa de Python nem de nenhuma outra instalação.
+No Python or any other installation is needed.
 
-1. Na página do projeto no GitHub, abra **Releases** (à direita) e baixe o
-   arquivo `PeptMass-<versão>-Windows.zip` (cerca de 220 MB).
-2. Clique com o botão direito no `.zip` → **Extrair tudo…** e escolha uma
-   pasta (por exemplo, `Documentos\PeptMass`). Não abra o programa de dentro do
-   `.zip`: extraia antes.
-3. Na pasta extraída, abra **`PeptMass\PeptMass.exe`** (duplo clique). A
-   janela do PeptMass abre em alguns segundos.
+1. On the project's GitHub page, open **Releases** (on the right) and download
+   `PeptMass-<version>-Windows.zip` (about 230 MB).
+2. Right-click the `.zip` → **Extract All…** and choose a folder (for example,
+   `Documents\PeptMass`). Do not run the program from inside the `.zip`:
+   extract it first.
+3. In the extracted folder, open **`PeptMass\PeptMass.exe`** (double-click).
+   The PeptMass window opens in a few seconds.
 
-> **Aviso "O Windows protegeu o computador".** Na primeira vez, o Windows
-> pode mostrar essa tela azul (SmartScreen), porque o programa ainda não tem
-> assinatura digital de uma empresa. Para abrir:
-> clique em **Mais informações** → **Executar assim mesmo**. O aviso não volta
-> nas próximas vezes. Se o antivírus da instituição bloquear o programa, peça
-> ao suporte de TI para liberar a pasta do PeptMass.
+> **"Windows protected your PC" warning.** The first time, Windows may show
+> this blue screen (SmartScreen), because the program does not yet have a
+> company's digital signature. To open it:
+> click **More info** → **Run anyway**. The warning does not come back
+> afterwards. If your institution's antivirus blocks the program, ask IT
+> support to allow the PeptMass folder.
 
-**Mantenha a pasta inteira.** O `PeptMass.exe` precisa da pasta `_internal`
-que está ao lado dele. Para levar o programa a outro computador, copie a pasta
-`PeptMass` inteira. Para criar um atalho, clique com o botão direito no
-`PeptMass.exe` → **Mostrar mais opções** → **Enviar para** → **Área de
-trabalho (criar atalho)**.
+**Keep the whole folder.** `PeptMass.exe` needs the `_internal` folder next to
+it. To take the program to another computer, copy the entire `PeptMass`
+folder. To create a desktop shortcut, right-click `PeptMass.exe` → **Show more
+options** → **Send to** → **Desktop (create shortcut)**.
 
-**Abrir arquivos `.raw` da Thermo.** O programa não traz o leitor de `.raw`
-(ThermoRawFileParser), porque a licença da biblioteca da Thermo não permite
-distribuí-lo junto com o PeptMass. Para instalar, uma única vez:
+**Opening Thermo `.raw` files.** The program does not ship the `.raw` reader
+(ThermoRawFileParser), because the license of Thermo's library does not allow
+distributing it together with PeptMass. To install it, once:
 
-1. Abra a tela **Dados experimentais**.
-2. Clique em **Instalar leitor de .raw** (precisa de internet).
-3. Leia a licença da Thermo que aparece e clique em **Aceito e instalar**.
+1. Open the **Experimental data** screen.
+2. Click **Install .raw reader** (internet required).
+3. Read the Thermo license that appears and click **Accept and install**.
 
-O PeptMass baixa a versão oficial do
-[ThermoRawFileParser](https://github.com/compomics/ThermoRawFileParser), confere
-que o arquivo é o original (SHA-256) e só instala se você aceitar. Se recusar,
-nada fica no computador. Arquivos `.mzML` e `.mzXML` abrem sem o leitor.
+PeptMass downloads the official
+[ThermoRawFileParser](https://github.com/compomics/ThermoRawFileParser) release,
+checks that the file is the original one (SHA-256) and installs it only if you
+accept. If you decline, nothing is left on the computer. `.mzML` and `.mzXML`
+files open without the reader.
 
-**Onde ficam os dados.** Peptídeos salvos, aminoácidos e modificações
-cadastrados ficam em `C:\Users\<seu usuário>\.peptmass\peptmass.db`, junto com
-o leitor de `.raw` (se instalado). Atualizar o programa (baixar um `.zip` novo)
-não apaga esses dados.
+**Where the data lives.** Saved peptides and your registered amino acids and
+modifications are stored in `C:\Users\<your user>\.peptmass\peptmass.db`,
+together with the `.raw` reader (if installed). Updating the program
+(downloading a new `.zip`) does not erase this data.
 
-**Atualizar.** Baixe o `.zip` da nova versão em Releases, extraia e use a nova
-pasta. A pasta antiga pode ser apagada.
+**Updating.** Download the new version's `.zip` from Releases, extract it and
+use the new folder. The old folder can be deleted.
 
-**Desinstalar.** Apague a pasta do programa. Para apagar também os dados,
-apague a pasta `C:\Users\<seu usuário>\.peptmass`.
+**Uninstalling.** Delete the program folder. To delete the data as well,
+delete the `C:\Users\<your user>\.peptmass` folder.
 
 ---
 
-## 2. Docker (Windows, macOS e Linux)
+## 2. Docker (Windows, macOS and Linux)
 
-O Docker roda o PeptMass num "container" e você usa o programa pelo navegador.
-O container **já traz o leitor de `.raw`**: não é preciso instalar mais nada.
+Docker runs PeptMass in a "container" and you use the program in your web
+browser. The container **already includes the `.raw` reader**: nothing else
+needs to be installed.
 
-### 2.1 Instalar o Docker (uma vez)
+### 2.1 Install Docker (once)
 
-- **Windows e macOS:** instale o
-  [Docker Desktop](https://www.docker.com/products/docker-desktop/) e abra-o.
-  Espere o ícone da baleia indicar que o Docker está rodando. No Windows, o
-  instalador pode pedir para ativar o WSL 2 e reiniciar o computador.
-- **Mac com chip Apple (M1 ou mais novo):** o leitor de `.raw` só existe para
-  processadores Intel/AMD (amd64), então o Docker Desktop roda o PeptMass pela
-  emulação Rosetta. Se o Docker pedir, aceite instalar o Rosetta; em
-  **Settings → General**, deixe marcada a opção *Use Rosetta for x86_64/amd64
-  emulation on Apple Silicon*.
-- **Linux:** instale o [Docker Engine](https://docs.docker.com/engine/install/)
-  com o plugin `docker compose`. Para não precisar de `sudo`:
-  `sudo usermod -aG docker $USER` e entre de novo na sessão.
+- **Windows and macOS:** install
+  [Docker Desktop](https://www.docker.com/products/docker-desktop/) and open it.
+  Wait until the whale icon shows that Docker is running. On Windows, the
+  installer may ask you to enable WSL 2 and restart the computer.
+- **Mac with Apple chip (M1 or newer):** the `.raw` reader only exists for
+  Intel/AMD processors (amd64), so Docker Desktop runs PeptMass through Rosetta
+  emulation. If Docker asks, accept installing Rosetta; in **Settings →
+  General**, keep *Use Rosetta for x86_64/amd64 emulation on Apple Silicon*
+  checked.
+- **Linux:** install [Docker Engine](https://docs.docker.com/engine/install/)
+  with the `docker compose` plugin. To avoid needing `sudo`:
+  `sudo usermod -aG docker $USER` and log in again.
 
-Para conferir, abra um terminal (no Windows, o **PowerShell**) e rode:
+To check, open a terminal (on Windows, **PowerShell**) and run:
 
 ```bash
 docker compose version
 ```
 
-### 2.2 Baixar o PeptMass
+### 2.2 Download PeptMass
 
-Com git:
+With git:
 
 ```bash
 git clone https://github.com/luizeduardo29/PeptMass.git
 cd PeptMass
 ```
 
-Sem git: na página do projeto no GitHub, clique em **Code → Download ZIP**,
-extraia o `.zip` e abra o terminal dentro da pasta extraída (a que tem o
-arquivo `docker-compose.yml`).
+Without git: on the project's GitHub page, click **Code → Download ZIP**,
+extract the `.zip` and open the terminal inside the extracted folder (the one
+that contains `docker-compose.yml`).
 
-### 2.3 Subir o PeptMass
+### 2.3 Start PeptMass
 
-Dentro da pasta do projeto:
+Inside the project folder:
 
 ```bash
 docker compose up -d --build
 ```
 
-A primeira vez demora alguns minutos (baixa e monta a imagem, cerca de 900 MB).
-Depois, abra no navegador: **<http://localhost:8010>**
+The first time takes a few minutes (it downloads and builds the image, about
+900 MB). Then open in your browser: **<http://localhost:8010>**
 
-O container fica rodando em segundo plano e volta sozinho quando o Docker
-reinicia (por exemplo, depois de religar o computador).
+The container keeps running in the background and comes back by itself when
+Docker restarts (for example, after rebooting the computer).
 
-### 2.4 Comandos do dia a dia
+### 2.4 Everyday commands
 
-Rode todos dentro da pasta do projeto.
+Run them all inside the project folder.
 
-| Para | Comando |
+| To | Command |
 |---|---|
-| Ver se está rodando | `docker compose ps` |
-| Parar (os dados ficam guardados) | `docker compose stop` |
-| Iniciar de novo | `docker compose start` |
-| Ver o registro (log) | `docker compose logs -f` (Ctrl+C sai) |
-| Atualizar para a versão nova | `git pull` (ou baixe o ZIP novo) e depois `docker compose up -d --build` |
-| Remover o container (os dados ficam) | `docker compose down` |
-| Remover o container **e apagar os dados** | `docker compose down -v` |
-| Copiar o banco para a pasta atual (backup) | `docker compose cp peptmass:/data/peptmass.db ./peptmass.db` |
+| Check that it is running | `docker compose ps` |
+| Stop (data is kept) | `docker compose stop` |
+| Start again | `docker compose start` |
+| See the log | `docker compose logs -f` (Ctrl+C exits) |
+| Update to a new version | `git pull` (or download the new ZIP), then `docker compose up -d --build` |
+| Remove the container (data is kept) | `docker compose down` |
+| Remove the container **and delete the data** | `docker compose down -v` |
+| Copy the database to the current folder (backup) | `docker compose cp peptmass:/data/peptmass.db ./peptmass.db` |
 
-### 2.5 Ajustes
+### 2.5 Settings
 
-As opções vão antes do comando (Linux e macOS) ou num arquivo `.env` na pasta
-do projeto (qualquer sistema, inclusive Windows), uma por linha, por exemplo
+Settings go before the command (Linux and macOS) or in a `.env` file in the
+project folder (any system, including Windows), one per line, for example
 `PORTA_HOST=8020`.
 
-| Variável | Padrão | O que faz |
+| Variable | Default | What it does |
 |---|---|---|
-| `PORTA_HOST` | `8010` | Porta no computador. Use outra se a 8010 estiver ocupada. |
-| `PEPTMASS_MAX_UPLOAD_MB` | `4096` | Tamanho máximo de arquivo de MS enviado, em MB. |
-| `MEM_LIMIT` | `2g` | Memória máxima do container. Aumente para arquivos `.raw` grandes em perfil. |
-| `PEPTMASS_INSTANCIA` | `peptmass` | Nome da instância (e do volume com os dados). |
+| `PORTA_HOST` | `8010` | Port on the computer. Use another one if 8010 is taken. |
+| `PEPTMASS_MAX_UPLOAD_MB` | `4096` | Maximum size of an uploaded MS file, in MB. |
+| `MEM_LIMIT` | `2g` | Maximum memory of the container. Raise it for large `.raw` files in profile mode. |
+| `PEPTMASS_INSTANCIA` | `peptmass` | Instance name (and name of the data volume). |
 
-Exemplo (Linux/macOS): `PORTA_HOST=8020 docker compose up -d`.
+Example (Linux/macOS): `PORTA_HOST=8020 docker compose up -d`.
 
-**Usar de outros computadores da rede.** O container aceita conexões da rede:
-os colegas abrem `http://<IP do seu computador>:8010`. No Windows, pode ser
-preciso liberar a porta 8010 no Firewall do Windows. O PeptMass **não tem
-login**: deixe-o acessível só na rede interna, nunca direto na internet.
+**Using it from other computers on the network.** The container accepts
+network connections: colleagues open `http://<your computer's IP>:8010`. On
+Windows, you may need to allow port 8010 in Windows Firewall. PeptMass **has
+no login**: keep it reachable only on an internal network, never directly on
+the internet.
 
-**Rodar duas instâncias** (por exemplo, uma por equipe, cada uma com seu
-próprio banco): dê outro nome e outra porta à segunda.
+**Running two instances** (for example, one per team, each with its own
+database): give the second one another name and another port.
 
 ```bash
 PEPTMASS_INSTANCIA=peptmass2 PORTA_HOST=8011 docker compose up -d
 ```
 
-No Windows (PowerShell):
+On Windows (PowerShell):
 
 ```powershell
 $env:PEPTMASS_INSTANCIA="peptmass2"; $env:PORTA_HOST="8011"; docker compose up -d
 ```
 
-Para parar ou atualizar essa segunda instância, use o mesmo
-`PEPTMASS_INSTANCIA` nos comandos.
+To stop or update that second instance, use the same `PEPTMASS_INSTANCIA` in
+the commands.
 
-**Onde ficam os dados.** No volume do Docker `peptmass_dados` (ou
-`<instância>_dados`). Ele sobrevive a `stop`, `down`, atualizações e
-reinícios; só `docker compose down -v` o apaga. Os arquivos de MS enviados são
-temporários: saem do disco quando o arquivo é fechado (o PeptMass mantém até 3
-abertos) e quando o container reinicia.
+**Where the data lives.** In the Docker volume `peptmass_dados` (or
+`<instance>_dados`). It survives `stop`, `down`, updates and restarts; only
+`docker compose down -v` deletes it. Uploaded MS files are temporary: they
+leave the disk when the file is closed (PeptMass keeps up to 3 open) and when
+the container restarts.
 
 ---
 
-## 3. Python (código-fonte)
+## 3. Python (source code)
 
-Requer **Python 3.10 ou mais novo**
-([python.org](https://www.python.org/downloads/); no Windows, marque *Add
-python.exe to PATH* na instalação).
+Requires **Python 3.10 or newer**
+([python.org](https://www.python.org/downloads/); on Windows, check *Add
+python.exe to PATH* during installation).
 
 ```bash
 git clone https://github.com/luizeduardo29/PeptMass.git
@@ -201,271 +203,273 @@ python -m venv .venv
 # Linux/macOS:  source .venv/bin/activate
 ```
 
-**No navegador** (a mesma versão do container):
+**In the browser** (the same version as the container):
 
 ```bash
 pip install -r requirements/web.txt
-python run_web.py                         # http://127.0.0.1:8010, só neste computador
-python run_web.py --host 0.0.0.0          # também para a rede (sem login: só rede interna)
-python run_web.py --port 8020             # outra porta
+python run_web.py                         # http://127.0.0.1:8010, this computer only
+python run_web.py --host 0.0.0.0          # also on the network (no login: internal network only)
+python run_web.py --port 8020             # another port
 ```
 
-**Numa janela própria** (o mesmo programa do `.exe`):
+**In its own window** (the same program as the `.exe`):
 
 ```bash
 pip install -r requirements/desktop.txt
 python run_desktop.py
 ```
 
-No Windows, `scripts\run_desktop.bat` faz tudo isso com um duplo clique: na
-primeira vez cria a `.venv` e instala as dependências.
+On Windows, `scripts\run_desktop.bat` does all of this with a double-click:
+the first time it creates the `.venv` and installs the dependencies.
 
-Variáveis de ambiente:
+Environment variables:
 
-| Variável | Padrão | O que faz |
+| Variable | Default | What it does |
 |---|---|---|
-| `PEPTMASS_HOST` / `PEPTMASS_PORT` | `127.0.0.1` / `8010` | Endereço do `run_web.py` (o mesmo que `--host` / `--port`). |
-| `PEPTMASS_DATA_DIR` | `~/.peptmass` | Pasta do banco e dos envios temporários. |
-| `PEPTMASS_MAX_UPLOAD_MB` | `4096` | Tamanho máximo de arquivo de MS enviado, em MB. |
-| `PEPTMASS_THERMO_PARSER` | — | Caminho do `ThermoRawFileParser.exe`, para abrir `.raw`. |
+| `PEPTMASS_HOST` / `PEPTMASS_PORT` | `127.0.0.1` / `8010` | Address of `run_web.py` (same as `--host` / `--port`). |
+| `PEPTMASS_DATA_DIR` | `~/.peptmass` | Folder for the database and temporary uploads. |
+| `PEPTMASS_MAX_UPLOAD_MB` | `4096` | Maximum size of an uploaded MS file, in MB. |
+| `PEPTMASS_THERMO_PARSER` | — | Path to `ThermoRawFileParser.exe`, to open `.raw`. |
 
-Para abrir `.raw` rodando pelo Python, instale o
-[ThermoRawFileParser](https://github.com/compomics/ThermoRawFileParser) e
-coloque a pasta `ThermoRawFileParser/` na raiz do projeto ou em `~/.peptmass/`,
-ou aponte `PEPTMASS_THERMO_PARSER`. No Windows basta o .NET Framework (já vem
-no Windows 10/11); no Linux e no macOS é preciso o `mono`. O botão **Instalar
-leitor de .raw** aparece apenas no programa para Windows (`run_desktop.py` /
-`.exe`).
+To open `.raw` when running from Python, install
+[ThermoRawFileParser](https://github.com/compomics/ThermoRawFileParser) and put
+the `ThermoRawFileParser/` folder in the project root or in `~/.peptmass/`, or
+point `PEPTMASS_THERMO_PARSER` to it. On Windows the .NET Framework is enough
+(it comes with Windows 10/11); on Linux and macOS `mono` is required. The
+**Install .raw reader** button only appears in the Windows program
+(`run_desktop.py` / `.exe`).
 
 ---
 
-## Problemas comuns
+## Troubleshooting
 
-| Sintoma | Solução |
+| Symptom | Solution |
 |---|---|
-| "O Windows protegeu o computador" ao abrir o `.exe` | **Mais informações** → **Executar assim mesmo** (ver seção 1). |
-| O `.exe` não abre ou fecha logo | Extraia o `.zip` inteiro antes (não rode de dentro dele) e não separe o `PeptMass.exe` da pasta `_internal`. |
-| "Para abrir .raw é preciso o leitor ThermoRawFileParser…" | No `.exe`: botão **Instalar leitor de .raw** na tela Dados experimentais. Pelo Python: ver seção 3. Ou converta o `.raw` para mzML (msconvert ou ThermoRawFileParser). |
-| Falha ao baixar o leitor de `.raw` | Precisa de internet com acesso ao GitHub. Em redes com bloqueio, tente de outra rede ou peça liberação de `github.com`. |
-| "… passa do limite de envio deste servidor" | Aumente `PEPTMASS_MAX_UPLOAD_MB` (seção 2.5) e suba de novo com `docker compose up -d`. |
-| `.raw` grande em perfil falha no Docker | Aumente `MEM_LIMIT` (por exemplo, `4g`). |
-| `docker compose up` diz que a porta 8010 está ocupada | Use outra porta: `PORTA_HOST=8020` (seção 2.5). |
-| `docker: command not found` / "Cannot connect to the Docker daemon" | Abra o Docker Desktop (Windows/macOS) ou inicie o serviço (`sudo systemctl start docker` no Linux). |
-| Colegas não conseguem abrir pela rede | Use o IP do computador (não `localhost`) e libere a porta no firewall. Pelo Python, suba com `--host 0.0.0.0`. |
-| A busca no PubChem falha | Precisa de internet com acesso a `pubchem.ncbi.nlm.nih.gov`. |
+| "Windows protected your PC" when opening the `.exe` | **More info** → **Run anyway** (see section 1). |
+| The `.exe` does not open or closes right away | Extract the whole `.zip` first (do not run it from inside the `.zip`) and do not separate `PeptMass.exe` from the `_internal` folder. |
+| "Opening .raw files requires the ThermoRawFileParser reader…" | In the `.exe`: the **Install .raw reader** button on the Experimental data screen. From Python: see section 3. Or convert the `.raw` to mzML (msconvert or ThermoRawFileParser). |
+| Downloading the `.raw` reader fails | Internet access to GitHub is required. On restricted networks, try another network or ask for `github.com` to be allowed. |
+| "… above this server's upload limit" | Raise `PEPTMASS_MAX_UPLOAD_MB` (section 2.5) and start again with `docker compose up -d`. |
+| A large `.raw` in profile mode fails in Docker | Raise `MEM_LIMIT` (for example, `4g`). |
+| `docker compose up` says port 8010 is in use | Use another port: `PORTA_HOST=8020` (section 2.5). |
+| `docker: command not found` / "Cannot connect to the Docker daemon" | Open Docker Desktop (Windows/macOS) or start the service (`sudo systemctl start docker` on Linux). |
+| Colleagues cannot open it over the network | Use the computer's IP (not `localhost`) and allow the port in the firewall. From Python, start with `--host 0.0.0.0`. |
+| PubChem search fails | Internet access to `pubchem.ncbi.nlm.nih.gov` is required. |
 
 ---
 
-## Telas
+## Screens
 
-**Início**, **Massa** (Aba 1), **Fragmentação** (Aba 2), **Dados
-experimentais** (Aba 3), **Biblioteca** (aminoácidos não-naturais,
-modificações e PubChem) e **Como usar** (demonstrações interativas). A tela
-Como usar abre um arquivo de exemplo
-(`peptmass/web/static/exemplos/exemplo_PEPTIDE.mzML`) para experimentar a Aba 3
-sem dados próprios.
+**Home**, **Mass** (Tab 1), **Fragmentation** (Tab 2), **Experimental data**
+(Tab 3), **Library** (non-natural amino acids, modifications and PubChem) and
+**How to use** (interactive demos). The How to use screen opens an example
+file (`peptmass/web/static/exemplos/exemplo_PEPTIDE.mzML`) so you can try Tab 3
+without your own data.
 
 ---
 
-## Arquitetura
+## Architecture
 
 ```text
 peptmass/
-  core/             cálculo científico, sem interface
-    constants.py        massas atômicas, isótopos, aminoácidos naturais
-    formula_parser.py   fórmulas moleculares e massa de composição
-    modifications.py    biblioteca de modificações
-    custom_residues.py  aminoácidos não-naturais
-    mass_calculator.py  sequência, massas, m/z e distribuição isotópica
-    fragmentation.py    séries a/b/c/x/y/z, perdas neutras, matching
-    scoring.py          escore de Morpheus e erro de massa
-    identification.py   carga, ajuste isotópico e critérios de identificação
-    presets.py          peptídeos pré-carregados
-    workspace.py        banco + bibliotecas + calculadora (web e desktop)
-    i18n.py             mensagens do núcleo e do desktop
-  infra/            acesso externo
-    database.py         SQLite local
-    spectra_io.py       mzML, mzXML, .raw e centroidização
+  core/             scientific computation, no interface
+    constants.py        atomic masses, isotopes, natural amino acids
+    formula_parser.py   molecular formulas and composition mass
+    modifications.py    modification library
+    custom_residues.py  non-natural amino acids
+    mass_calculator.py  sequence, masses, m/z and isotope distribution
+    fragmentation.py    a/b/c/x/y/z series, neutral losses, matching
+    scoring.py          Morpheus score and mass error
+    identification.py   charge, isotope fit and identification criteria
+    presets.py          preloaded peptides
+    workspace.py        database + libraries + calculator (web and desktop)
+    i18n.py             core messages
+  infra/            external access
+    database.py         local SQLite
+    spectra_io.py       mzML, mzXML, .raw and centroiding
+    raw_reader.py       user-driven install of the .raw reader (Windows program)
     pubchem.py          PubChem (PUG REST)
     exporters.py        CSV, XLSX, PDF, TXT, FASTA, Skyline
   web/              Flask
     __init__.py         create_app
-    blueprints/         pages.py (telas) e api/ (mass, fragments, library, spectra)
+    blueprints/         pages.py (screens) and api/ (mass, fragments, library, spectra)
     templates/  static/  locales/
-  desktop/          janela do executável
-    app.py              servidor interno + interface web num QWebEngineView
+  desktop/          window of the executable
+    app.py              internal server + web interface in a QWebEngineView
 packaging/          PyInstaller (peptmass.spec, build.bat, build.sh)
-scripts/            atalhos do desktop no Windows
+scripts/            Windows desktop shortcuts
 requirements/       desktop.txt, web.txt, build.txt
-run_web.py          entrada web
-run_desktop.py      entrada desktop
+run_web.py          web entry point
+run_desktop.py      desktop entry point
 ```
 
-As dependências andam em um sentido: `web` e `desktop` usam `infra` e `core`;
-`infra` usa `core`; `core` não conhece nenhuma interface.
+Dependencies flow one way: `web` and `desktop` use `infra` and `core`;
+`infra` uses `core`; `core` knows no interface.
 
 ---
 
-## ABA 1 — Massa Molecular
+## TAB 1 — Molecular mass
 
-- Entrada de sequência com **validação automática**.
-- 20 aminoácidos naturais (massas monoisotópicas IUPAC).
-- **Modificações**: N-terminal, C-terminal e por resíduo (Acetyl, PyroGlu,
+- Sequence input with **automatic validation**.
+- 20 natural amino acids (IUPAC monoisotopic masses).
+- **Modifications**: N-terminal, C-terminal and per residue (Acetyl, PyroGlu,
   Formyl, Amidation, Oxidation, Phosphorylation, Carbamidomethyl, Deamidation,
-  Sulfation e outras).
-- Modificações **inline**: `PEPT(Phosphorylation)IDE`.
-- **Múltiplas cadeias**: separe as cadeias com `/` — cada uma contribui com sua
-  própria água terminal. Ex.: insulina = `GIVEQCC.../FVNQHLC...`. As pontes
-  dissulfeto entram como a modificação `Disulfide (-2H)` em uma Cys por ponte.
-  (A fragmentação MS/MS da Aba 2 não se aplica a múltiplas cadeias.)
-- **Acilações de lisina dos análogos de GLP** (aplicáveis a `K`): cadeias laterais
-  de liraglutida, semaglutida, tirzepatida e retatrutida — cada delta validado
-  reconstruindo a fórmula do fármaco inteiro contra o PubChem.
-- **Catálogo embutido** de resíduos não-naturais comuns, sempre disponíveis
-  (não editáveis): Aib, pGlu, Mpa, Orn, Nle, Nva, Hyp, Cit, Sar, Abu, Dab,
-  Dap, Pen, aMeLeu (α-metil-leucina), Nal (2-naftilalanina), MeW (2-metil-Trp),
-  SertBu (O-terc-butil-Ser). Aparecem na tabela marcados como `embutido`.
-- **Custom Amino Acids**: cadastro de resíduos não-naturais por fórmula
-  molecular — massa calculada e armazenada em banco local.
-  O **código pode ter de 1 a 3+ letras**; na sequência, resíduos multi-caractere
-  vão **entre colchetes**: `A[Orn]G[Nle]K` (letra solta = aminoácido natural).
-  Códigos de 1 letra continuam funcionando com ou sem colchetes.
-- **Resíduos desconhecidos**: ao digitar uma sequência com um código não
-  cadastrado (ex.: `[Aib]`), o botão *"Definir resíduo(s) desconhecido(s)…"*
-  abre o cadastro assistido (com busca no PubChem) e salva na base.
-- **Busca no PubChem**: pesquise por nome, CID ou fórmula e a fórmula molecular
-  é preenchida automaticamente (com estrutura 2D e massas para conferência).
-  Disponível no botão "🔍 PubChem" da barra de ferramentas e dentro dos
-  diálogos de novo aminoácido e nova modificação. Requer conexão à internet.
-- **Peptídeos salvos**: guarde a sequência + modificações (N/C-terminal e por
-  resíduo) sob um nome no banco local e recarregue com um clique — não precisa
-  redigitar. Já vêm **pré-carregados**, com massas validadas contra o PubChem:
-  análogos de **GLP** (liraglutida, semaglutida, tirzepatida, retatrutida) e
-  peptídeos de **controle antidopagem** (WADA S2): GnRH e agonistas
-  (gonadorelina, triptorelina, leuprolida, nafarelina, buserelina, goserelina),
-  GHRPs (GHRP-1, GHRP-2, GHRP-6, hexarelina, ipamorelina, alexamorelina),
-  GHRH/GRF (sermorelina, Mod GRF 1-29, CJC-1295 com DAC, tesamorelina),
-  hGH (somatropina), IGF-1, timosina β4 (43 aa) e seu fragmento ativo
-  **TB-500** (Ac-LKKTETQ, resíduos 17–23), melanotanas I e II,
-  nootrópicos (semax, selank), MOTS-c, vasopressina e análogos, ghrelina,
-  BPC-157, ARA-290, corticotropinas (tetracosactídeo/Synacthen, ACTH 1-39),
-  ocitocina, PT-141, timosina α1, epitalon, IGF-1 LR3, MGF, uma bateria de
-  fragmentos/metabólitos do método de triagem, e as
-  **insulinas** de duas cadeias (humana, lispro/Humalog, asparte/NovoLog,
-  glulisina/Apidra, glargina/Lantus, detemir/Levemir, degludec/Tresiba).
-- **Massa monoisotópica** e **massa média** (6 casas decimais).
-- **Fórmula elementar** completa.
-- **Tabela de estados de carga** (faixa configurável + extras como +15, +20).
-- **Distribuição isotópica teórica** (gráfico).
-- **Importação FASTA**.
+  Sulfation and others).
+- **Inline** modifications: `PEPT(Phosphorylation)IDE`.
+- **Multiple chains**: separate chains with `/`; each one contributes its own
+  terminal water. E.g. insulin = `GIVEQCC.../FVNQHLC...`. Disulfide bridges are
+  entered as the `Disulfide (-2H)` modification on one Cys per bridge.
+  (MS/MS fragmentation in Tab 2 does not apply to multiple chains.)
+- **Lysine acylations of GLP analogues** (applicable to `K`): side chains of
+  liraglutide, semaglutide, tirzepatide and retatrutide; each delta validated
+  by rebuilding the whole drug's formula against PubChem.
+- **Built-in catalog** of common non-natural residues, always available
+  (not editable): Aib, pGlu, Mpa, Orn, Nle, Nva, Hyp, Cit, Sar, Abu, Dab,
+  Dap, Pen, aMeLeu (α-methyl-leucine), Nal (2-naphthylalanine), MeW
+  (2-methyl-Trp), SertBu (O-tert-butyl-Ser). They are marked as built-in in the
+  table.
+- **Custom amino acids**: register non-natural residues by molecular formula;
+  the mass is calculated and stored in the local database.
+  The **code can have 1 to 3+ letters**; in the sequence, multi-character
+  residues go **in brackets**: `A[Orn]G[Nle]K` (a single letter = natural amino
+  acid). One-letter codes work with or without brackets.
+- **Unknown residues**: when a sequence contains an unregistered code (e.g.
+  `[Aib]`), the *"Define unknown residue(s)…"* button opens an assisted
+  registration (with PubChem search) and saves it to the database.
+- **PubChem search**: search by name, CID or formula and the molecular formula
+  is filled in automatically (with 2D structure and masses for checking).
+  Available on the Library screen. Requires an internet connection.
+- **Saved peptides**: store the sequence + modifications (N/C-terminal and per
+  residue) under a name in the local database and reload them with one click.
+  They come **preloaded**, with masses validated against PubChem:
+  **GLP** analogues (liraglutide, semaglutide, tirzepatide, retatrutide) and
+  **anti-doping** peptides (WADA S2): GnRH and agonists (gonadorelin,
+  triptorelin, leuprolide, nafarelin, buserelin, goserelin), GHRPs (GHRP-1,
+  GHRP-2, GHRP-6, hexarelin, ipamorelin, alexamorelin), GHRH/GRF (sermorelin,
+  Mod GRF 1-29, CJC-1295 with DAC, tesamorelin), hGH (somatropin), IGF-1,
+  thymosin β4 (43 aa) and its active fragment **TB-500** (Ac-LKKTETQ, residues
+  17–23), melanotan I and II, nootropics (semax, selank), MOTS-c, vasopressin
+  and analogues, ghrelin, BPC-157, ARA-290, corticotropins
+  (tetracosactide/Synacthen, ACTH 1-39), oxytocin, PT-141, thymosin α1,
+  epitalon, IGF-1 LR3, MGF, a set of fragments/metabolites from the screening
+  method, and the two-chain **insulins** (human, lispro/Humalog,
+  aspart/NovoLog, glulisine/Apidra, glargine/Lantus, detemir/Levemir,
+  degludec/Tresiba).
+- **Monoisotopic mass** and **average mass** (6 decimal places).
+- Complete **elemental formula**.
+- **Charge state table** (configurable range + extras such as +15, +20).
+- **Theoretical isotope distribution** (chart).
+- **FASTA import**.
 
-Fórmula de m/z:
+m/z formula:
 
 ```
 m/z = (M + z × 1.007276466812) / z
 ```
 
-## ABA 2 — Fragmentação MS/MS
+## TAB 2 — MS/MS fragmentation
 
-- Seleção de séries: **a, b, c, x, y, z** (e z• radical para ETD/ECD).
-- **Perdas neutras**: −NH₃, −H₂O, −CO (combináveis).
-- **Estados de carga** dos fragmentos: +1 a +5.
-- Tabela ordenável com íon, carga, m/z, perda, massa neutra e subsequência.
-- **Busca rápida** de fragmentos.
-- **Matching** com lista experimental de m/z (tolerância em Da ou ppm).
-- **Espectro teórico** (gráfico).
-- **Exportação**: CSV, Excel (.xlsx), PDF, TXT e lista de transições Skyline.
+- Series selection: **a, b, c, x, y, z** (and radical z• for ETD/ECD).
+- **Neutral losses**: −NH₃, −H₂O, −CO (combinable).
+- Fragment **charge states**: +1 to +5.
+- Sortable table with ion, charge, m/z, loss, neutral mass and subsequence.
+- **Quick search** of fragments.
+- **Matching** against an experimental m/z list (tolerance in Da or ppm).
+- **Theoretical spectrum** (chart).
+- **Export**: CSV, Excel (.xlsx), PDF, TXT and Skyline transition list.
 
-## ABA 3 — Dados experimentais
+## TAB 3 — Experimental data
 
-Compara o espectro **teórico** (gerado na Aba 2) com um espectro **real** de um
-arquivo de dados:
+Compares the **theoretical** spectrum (generated in Tab 2) with a **real**
+spectrum from a data file:
 
-1. **Abrir arquivo**: `.mzML`, `.mzXML` ou `.raw` (Thermo).
-2. **Filtro de scan** (estilo Xcalibur): escolha um dos filtros presentes no
-   arquivo (`FTMS + p NSI Full ms`, `... Full ms2 ...@hcd27`, etc.) para
-   restringir cromatograma, XIC e seleção de scan. Em DDA, a opção **agrupar**
-   mascara o m/z do precursor, reduzindo milhares de filtros a poucos tipos.
-3. **Cromatograma** por nível MS / filtro — **TIC** ou **XIC** (íon extraído:
-   informe um m/z e a tolerância em Da). **Clique num ponto** para escolher o
-   scan daquele tempo de retenção.
-   - **Perfil × centroide**: marque *"abrir .raw em perfil"* para converter sem
-     peak picking. Scans de perfil são detectados automaticamente, desenhados
-     como **linha contínua**, e centroidados internamente (máximo local +
-     refinamento parabólico no log) para o matching.
-3. O **espectro do scan** é exibido.
-4. **Casar com fragmentos**: anota os picos contra as séries teóricas e mostra um
-   **gráfico espelhado** (experimental ↑ / teórico ↓) com os íons rotulados, mais
-   uma tabela de anotação. O match considera automaticamente **perdas neutras**
-   (−NH₃/−H₂O/−CO) e **múltiplas cargas** (1..z máx), com tolerância em Da ou ppm.
-   Dê **duplo-clique** numa linha da tabela para ver o **XIC daquele íon**.
-   - **Escore de identificação**: cada match recebe o **escore de Morpheus**
-     (Wenger & Coon, *J. Proteome Res.* 2013) — nº de íons casados + fração da
-     corrente iônica explicada — além da **cobertura** de íons e do **erro de
-     massa** (mediano, máx e RMSE em ppm/Da) como controle de qualidade.
-   - **Critérios de identificação (estilo WADA)**: avalia e sinaliza (✓/✗)
-     **massa do precursor** (erro em ppm vs. o peptídeo da Aba 2), **tempo de
-     retenção** (dentro da janela informada), **íons diagnósticos** (nº casados
-     + abundância relativa na tabela) e **ajuste do envelope isotópico** do
-     precursor (cosseno teórico × experimental, do MS1 anterior).
-   - **Carga do precursor**: lida do arquivo ou **estimada automaticamente**
-     pelo espaçamento do cluster isotópico (deconvolução).
+1. **Open file**: `.mzML`, `.mzXML` or `.raw` (Thermo).
+2. **Scan filter** (Xcalibur style): choose one of the filters present in the
+   file (`FTMS + p NSI Full ms`, `... Full ms2 ...@hcd27`, etc.) to restrict the
+   chromatogram, XIC and scan selection. In DDA, the **group** option masks the
+   precursor m/z, reducing thousands of filters to a few types.
+3. **Chromatogram** by MS level / filter: **TIC** or **XIC** (extracted ion:
+   enter an m/z and the tolerance in Da). **Click a point** to choose the scan
+   at that retention time.
+   - **Profile × centroid**: check *"open .raw in profile"* to convert without
+     peak picking. Profile scans are detected automatically, drawn as a
+     **continuous line**, and centroided internally (local maximum + parabolic
+     refinement in log space) for matching.
+4. The **scan spectrum** is shown.
+5. **Match with fragments**: annotates the peaks against the theoretical series
+   and shows a **mirror plot** (experimental ↑ / theoretical ↓) with labeled
+   ions, plus an annotation table. Matching automatically considers **neutral
+   losses** (−NH₃/−H₂O/−CO) and **multiple charges** (1..max z), with tolerance
+   in Da or ppm. **Double-click** a table row to see the **XIC of that ion**.
+   - **Identification score**: each match gets the **Morpheus score** (Wenger &
+     Coon, *J. Proteome Res.* 2013), i.e. number of matched ions + fraction of
+     ion current explained, plus ion **coverage** and **mass error** (median,
+     max and RMSE in ppm/Da) as quality control.
+   - **Identification criteria (WADA style)**: evaluates and flags (✓/✗)
+     **precursor mass** (ppm error vs. the Tab 2 peptide), **retention time**
+     (within the given window), **diagnostic ions** (number matched + relative
+     abundance in the table) and the **isotope envelope fit** of the precursor
+     (theoretical × experimental cosine, from the preceding MS1).
+   - **Precursor charge**: read from the file or **estimated automatically**
+     from the isotope cluster spacing (deconvolution).
 
-A leitura usa `pyteomics`, `psims` e `lxml` (já em `requirements/`). O `.raw`
-é convertido para mzML pelo **ThermoRawFileParser** 1.4.5. O container já o
-traz (imagem oficial do Bioconda). O executável do Windows **não** o traz,
-porque a licença da biblioteca da Thermo (RawFileReader) restringe
-distribuí-la junto com software GPL: o próprio usuário o obtém pelo botão
-**Instalar leitor de .raw**, que baixa o pacote oficial
+Reading uses `pyteomics`, `psims` and `lxml` (already in `requirements/`).
+`.raw` files are converted to mzML by **ThermoRawFileParser** 1.4.5. The
+container already includes it (official Bioconda image). The Windows program
+does **not**, because the license of Thermo's library (RawFileReader)
+restricts distributing it together with GPL software: users obtain it
+themselves with the **Install .raw reader** button, which downloads the
+official package
 ([github.com/compomics/ThermoRawFileParser](https://github.com/compomics/ThermoRawFileParser)),
-confere o SHA-256, mostra a licença da Thermo e só instala (em
-`~/.peptmass/ThermoRawFileParser/`) se ele aceitar. O PeptMass procura o
-conversor, nesta ordem, em `PEPTMASS_THERMO_PARSER`, numa pasta
-`ThermoRawFileParser/` ao lado do `PeptMass.exe`, na raiz do projeto, em
-`~/.peptmass/` e no `PATH`. O mzML convertido fica na pasta do envio e é
-apagado quando o arquivo é fechado.
+checks its SHA-256, shows the Thermo license and installs it (into
+`~/.peptmass/ThermoRawFileParser/`) only if the user accepts. PeptMass looks
+for the converter, in this order, in `PEPTMASS_THERMO_PARSER`, in a
+`ThermoRawFileParser/` folder next to `PeptMass.exe`, in the project root, in
+`~/.peptmass/` and on the `PATH`. The converted mzML is kept in the upload
+folder and deleted when the file is closed.
 
-O arquivo de exemplo `peptmass/web/static/exemplos/exemplo_PEPTIDE.mzML` é
-sintético, com os íons b/y do peptídeo PEPTIDE.
+The example file `peptmass/web/static/exemplos/exemplo_PEPTIDE.mzML` is
+synthetic, with the b/y ions of the peptide PEPTIDE.
 
 ---
 
-## Validação científica
+## Scientific validation
 
-Os cálculos foram conferidos contra valores publicados (PEPTIDE, bradicinina,
-angiotensina II, substância P, séries de fragmentos, modificações), dentro de
-±0.001 Da, e os limites dos critérios de identificação também foram
-verificados.
+The calculations were checked against published values (PEPTIDE, bradykinin,
+angiotensin II, substance P, fragment series, modifications) within
+±0.001 Da, and the thresholds of the identification criteria were also
+verified.
 
-Padrões usados:
-- Massas monoisotópicas IUPAC.
-- Massa do próton = `1.007276466812`.
-- Precisão de 6 casas decimais.
-- Suporte a proteínas acima de 100 kDa (parsing < 5 ms).
+Standards used:
+- IUPAC monoisotopic masses.
+- Proton mass = `1.007276466812`.
+- 6 decimal places.
+- Supports proteins above 100 kDa (parsing < 5 ms).
 
 ---
 
 ## Interface
 
-- Tema **claro** e **escuro** e idiomas português, inglês e espanhol (menu do
-  globo no topo).
-- Tabelas ordenáveis e com botão de copiar.
-- Atualização automática dos cálculos enquanto se digita.
-- **Gráficos interativos** (Plotly): passe o mouse sobre os picos para ver íon,
-  carga, m/z e subsequência; arraste para dar zoom e clique duas vezes para voltar.
-- Tela **Como usar** com demonstrações interativas.
+- **Light** and **dark** themes and Portuguese, English and Spanish (globe
+  menu at the top).
+- Sortable tables with a copy button.
+- Calculations update automatically while typing.
+- **Interactive charts** (Plotly): hover over peaks to see ion, charge, m/z
+  and subsequence; drag to zoom and double-click to reset.
+- **How to use** screen with interactive demos.
 
 ---
 
-## Empacotamento (executável)
+## Packaging (executable)
 
-O `.zip` do Windows publicado em Releases é gerado pelo GitHub Actions
-(`.github/workflows/executaveis.yml`) ao criar uma tag `v*`: empacota com **PyInstaller** e anexa
-`PeptMass-<versão>-Windows.zip` à Release. Para macOS e Linux a forma
-distribuída é o Docker (seção 2); o build local abaixo existe, mas esses
-executáveis não são publicados nem testados.
+The Windows `.zip` published in Releases is built by GitHub Actions
+(`.github/workflows/executaveis.yml`) when a `v*` tag is pushed: it packages
+with **PyInstaller** and attaches `PeptMass-<version>-Windows.zip` to the
+Release. For macOS and Linux the distributed form is Docker (section 2); the
+local build below exists, but those executables are neither published nor
+tested.
 
-Para gerar o executável localmente:
+To build the executable locally:
 
 ```bash
 pip install -r requirements/build.txt
@@ -474,54 +478,54 @@ pip install -r requirements/build.txt
 **Windows:**
 
 ```bat
-packaging\build.bat              :: onedir em dist\PeptMass\PeptMass.exe
-packaging\build.bat onefile      :: um único dist\PeptMass.exe
+packaging\build.bat              :: onedir in dist\PeptMass\PeptMass.exe
+packaging\build.bat onefile      :: a single dist\PeptMass.exe
 ```
 
 **macOS / Linux:**
 
 ```bash
 chmod +x packaging/build.sh
-packaging/build.sh             # gera dist/PeptMass/ (+ dist/PeptMass.app no macOS)
-packaging/build.sh --onefile   # executável único
+packaging/build.sh             # builds dist/PeptMass/ (+ dist/PeptMass.app on macOS)
+packaging/build.sh --onefile   # single executable
 ```
 
-Ou diretamente, em qualquer plataforma:
+Or directly, on any platform:
 
 ```bash
 pyinstaller packaging/peptmass.spec --noconfirm --clean
 ```
 
-Detalhes:
+Details:
 
-- A receita está em [`packaging/peptmass.spec`](packaging/peptmass.spec); os
-  scripts `build.bat` e `build.sh` criam uma venv de build isolada e empacotam.
-- **onedir** (padrão) é mais confiável e tem startup mais rápido; **onefile**
-  (`PEPTMASS_ONEFILE=1`) gera um único arquivo, porém com startup mais lento e
-  maior chance de falso-positivo de antivírus no Windows.
-- O `.spec` leva as telas, traduções e arquivos estáticos de `peptmass/web`, o
-  navegador embutido (PyQt6-WebEngine) e os dados do `reportlab`; deixa de fora
-  os módulos QML do Qt e as ferramentas de desenvolvedor do navegador. O pacote
-  Windows fica com ~515 MB (~220 MB zipado).
-- **Ícone:** `packaging/peptmass.ico` (o mascote); no macOS, `peptmass.icns` na
-  raiz do projeto, se existir.
-- O banco local continua em `~/.peptmass/peptmass.db`, criado em runtime — nada
-  precisa ser embutido no pacote.
-- O executável deve ser gerado **na plataforma de destino** (PyInstaller não faz
-  cross-compile): builds Windows no Windows, builds macOS no macOS.
-- **Distribuição**: no modo onedir, o resultado é a pasta `dist/PeptMass/`
-  (executável + `_internal/`). Para levar a outro computador, **copie/zipe a
-  pasta inteira** — o `PeptMass.exe` sozinho não roda. Não precisa de Python
-  instalado no destino. O ThermoRawFileParser não é embutido; o usuário o
-  instala pelo botão da tela de Dados experimentais (ver Aba 3).
+- The recipe is in [`packaging/peptmass.spec`](packaging/peptmass.spec); the
+  `build.bat` and `build.sh` scripts create an isolated build venv and package.
+- **onedir** (default) is more reliable and starts faster; **onefile**
+  (`PEPTMASS_ONEFILE=1`) produces a single file, but starts slower and is more
+  likely to trigger antivirus false positives on Windows.
+- The `.spec` bundles the screens, translations and static files of
+  `peptmass/web`, the embedded browser (PyQt6-WebEngine) and the `reportlab`
+  data; it leaves out Qt's QML modules and the browser developer tools. The
+  Windows package is ~515 MB (~230 MB zipped).
+- **Icon:** `packaging/peptmass.ico` (the mascot); on macOS, `peptmass.icns` in
+  the project root, if present.
+- The local database stays in `~/.peptmass/peptmass.db`, created at runtime;
+  nothing needs to be bundled.
+- The executable must be built **on the target platform** (PyInstaller does
+  not cross-compile): Windows builds on Windows, macOS builds on macOS.
+- **Distribution**: in onedir mode, the result is the `dist/PeptMass/` folder
+  (executable + `_internal/`). To take it to another computer, **copy/zip the
+  whole folder**; `PeptMass.exe` alone does not run. No Python is needed on the
+  target. ThermoRawFileParser is not bundled; users install it with the button
+  on the Experimental data screen (see Tab 3).
 
-## Recursos avançados implementados
+## Advanced features
 
-1. Distribuição isotópica teórica (convolução de padrões elementares).
-2. Visualização gráfica do espectro teórico e do envelope isotópico.
-3. Matching experimental × teórico (Da/ppm).
-4. Importação FASTA.
-5. Exportação compatível com Skyline (transition list).
-6. Biblioteca editável de modificações customizadas.
-7. Fórmulas elementares completas dos peptídeos.
-8. Base para ETD/ECD (íon z•) e CID/HCD (perdas neutras).
+1. Theoretical isotope distribution (convolution of elemental patterns).
+2. Charts of the theoretical spectrum and isotope envelope.
+3. Experimental × theoretical matching (Da/ppm).
+4. FASTA import.
+5. Skyline-compatible export (transition list).
+6. Editable library of custom modifications.
+7. Complete elemental formulas of peptides.
+8. Groundwork for ETD/ECD (z• ion) and CID/HCD (neutral losses).
