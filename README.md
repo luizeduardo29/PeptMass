@@ -297,6 +297,7 @@ peptmass/
   desktop/          window of the executable
     app.py              internal server + web interface in a QWebEngineView
 packaging/          PyInstaller (peptmass.spec, build.bat, build.sh)
+tests/              test_science.py (scientific suite), test_web.py (web suite)
 scripts/            Windows desktop shortcuts
 requirements/       desktop.txt, web.txt, build.txt
 run_web.py          web entry point
@@ -438,7 +439,8 @@ synthetic, with the b/y ions of the peptide PEPTIDE.
 The calculations were checked against published values (PEPTIDE, bradykinin,
 angiotensin II, substance P, fragment series, modifications) within
 ±0.001 Da, and the thresholds of the identification criteria were also
-verified.
+verified. These checks are the scientific suite `tests/test_science.py`
+(see [Tests](#tests)).
 
 Standards used:
 - IUPAC monoisotopic masses.
@@ -460,12 +462,41 @@ Standards used:
 
 ---
 
+## Tests
+
+Two test programs run without a graphical interface:
+
+- **`tests/test_science.py`** (scientific suite, 31 checks): compares 19
+  computed values with published references within ±0.001 Da (monoisotopic
+  masses of PEPTIDE, bradykinin, angiotensin II, substance P amide and
+  ACDEFGHIKLMNPQRSTVWY; acetylation, amidation and phosphorylation deltas;
+  [M+H]+ to [M+3H]3+ of PEPTIDE; the a2/b2/c2/x2/y2/z2 ions of PEPTIDE; a
+  user-defined Aib residue) and checks the identification-criteria rules in 12
+  boundary cases. Needs only the core dependencies.
+- **`tests/test_web.py`** (web suite): exercises the Flask application with
+  the test client: the three language catalogs, every page in both color
+  modes, CSRF, the JSON endpoints, the library, exports and the Experimental
+  data screen with the bundled `exemplo_PEPTIDE.mzML`. Needs
+  `requirements/web.txt`.
+
+```bash
+python tests/test_science.py
+python tests/test_web.py
+```
+
+Both exit with a non-zero code on failure. The release workflow runs both
+before packaging, and `packaging/build.bat` / `build.sh` run the scientific
+suite before a local build, so a build stops if any value drifts from its
+reference.
+
+---
+
 ## Packaging (executable)
 
 The Windows `.zip` published in Releases is built by GitHub Actions
 (`.github/workflows/executaveis.yml`) when a `v*` tag is pushed: it packages
-with **PyInstaller** and attaches `PeptMass-<version>-Windows.zip` to the
-Release. For macOS and Linux the distributed form is Docker (section 2); the
+with **PyInstaller** after both test suites pass, and attaches
+`PeptMass-<version>-Windows.zip` to the Release. For macOS and Linux the distributed form is Docker (section 2); the
 local build below exists, but those executables are neither published nor
 tested.
 

@@ -19,8 +19,5 @@ ThermoRawFileParser/
 .env
 *.log
 
-# Testes locais (fora do repositorio)
-/tests/
-
 # Manuscrito e arquivos do artigo (nao publicar)
 Claude outputs/

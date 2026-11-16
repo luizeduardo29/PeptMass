@@ -41,7 +41,7 @@ if errorlevel 1 goto fail
 "%PYTHON%" -m pip install -r requirements\build.txt
 if errorlevel 1 goto fail
 
-REM A suite cientifica (tests\) fica fora do repositorio; roda so se existir.
+REM Suite cientifica (tests\): o build para se algum valor sair da referencia.
 if not exist tests\test_science.py goto semtestes
 echo ==^> Rodando a suite cientifica ^(rede de seguranca^)...
 "%PYTHON%" tests\test_science.py

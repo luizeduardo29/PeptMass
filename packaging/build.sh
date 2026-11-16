@@ -35,7 +35,7 @@ echo "==> Instalando dependencias..."
 "$PYTHON" -m pip install --upgrade pip
 "$PYTHON" -m pip install -r requirements/build.txt
 
-# A suite cientifica (tests/) fica fora do repositorio; roda so se existir.
+# Suite cientifica (tests/): o build para se algum valor sair da referencia.
 if [ -f tests/test_science.py ]; then
   echo "==> Rodando a suite cientifica (rede de seguranca)..."
   "$PYTHON" tests/test_science.py

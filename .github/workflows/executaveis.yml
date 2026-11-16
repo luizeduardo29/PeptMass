@@ -39,6 +39,13 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements/build.txt
 
+      - name: Suites de teste (cientifica e web)
+        env:
+          PYTHONIOENCODING: utf-8
+        run: |
+          python tests/test_science.py
+          python tests/test_web.py
+
       - name: PyInstaller
         run: python -m PyInstaller packaging/peptmass.spec --noconfirm --clean
 
