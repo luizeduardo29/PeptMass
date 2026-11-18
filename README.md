@@ -298,7 +298,7 @@ peptmass/
     app.py              internal server + web interface in a QWebEngineView
 packaging/          PyInstaller (peptmass.spec, build.bat, build.sh)
 tests/              test_science.py (scientific suite), test_web.py (web suite)
-scripts/            Windows desktop shortcuts
+scripts/            Windows desktop shortcuts; table2_decoys.py (Table 2 of the article)
 requirements/       desktop.txt, web.txt, build.txt
 run_web.py          web entry point
 run_desktop.py      desktop entry point
@@ -441,6 +441,19 @@ angiotensin II, substance P, fragment series, modifications) within
 ±0.001 Da, and the thresholds of the identification criteria were also
 verified. These checks are the scientific suite `tests/test_science.py`
 (see [Tests](#tests)).
+
+The LC-PRM verification of predicted fragment ions (Table 2 of the article,
+with the decoy estimate of random matches) is reproduced by
+`scripts/table2_decoys.py`:
+
+```bash
+python scripts/table2_decoys.py --self-test                 # no data needed
+python scripts/table2_decoys.py RAW_FOLDER --check --out table2.json
+```
+
+`--self-test` checks the predicted ion lists and neutral masses of the seven
+analytes; with the deposited .raw (or .mzML) files, `--check` compares every
+value with the published table.
 
 Standards used:
 - IUPAC monoisotopic masses.
